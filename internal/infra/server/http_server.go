@@ -99,7 +99,7 @@ func (s *httpServer) MountRoutes(db *sqlx.DB) {
 	userService := userSvc.NewUserService(userRepository, validator, uuid, bcrypt)
 	authService := authSvc.NewAuthService(authRepository, validator, uuid, bcrypt, jwt)
 
-	userController.InitUserController(v1, userService)
+	userController.InitUserController(v1, userService, middleware)
 	authController.InitAuthController(v1, authService, middleware)
 
 	s.app.Use(func(c *fiber.Ctx) error {

@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/contracts"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/dto"
+	"github.com/ahargunyllib/freepass-be-bcc-2025/internal/middlewares"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/helpers/http/response"
 	"github.com/gofiber/fiber/v2"
 )
@@ -11,17 +12,17 @@ type userController struct {
 	userService contracts.UserService
 }
 
-func InitUserController(router fiber.Router, userService contracts.UserService) {
+func InitUserController(router fiber.Router, userService contracts.UserService, middleware *middlewares.Middleware) {
 	controller := userController{
 		userService: userService,
 	}
 
 	userRouter := router.Group("/users")
 
-	userRouter.Get("/", controller.GetUsers)
-	userRouter.Get("/:id", controller.GetUser)
-	userRouter.Post("/", controller.CreateUser)
-	userRouter.Delete("/:id", controller.DeleteUser)
+	userRouter.Get("/", middleware.RequireAuth(), middleware.RequirePermission([]int16{3}), controller.GetUsers)
+	userRouter.Get("/:id", middleware.RequireAuth(), middleware.RequirePermission([]int16{3}), controller.GetUser)
+	userRouter.Post("/", middleware.RequireAuth(), middleware.RequirePermission([]int16{3}), controller.CreateUser)
+	userRouter.Delete("/:id", middleware.RequireAuth(), middleware.RequirePermission([]int16{3}), controller.DeleteUser)
 }
 
 func (u *userController) GetUsers(c *fiber.Ctx) error {
