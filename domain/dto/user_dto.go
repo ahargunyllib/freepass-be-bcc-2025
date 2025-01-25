@@ -11,7 +11,7 @@ type UserResponse struct {
 }
 
 type GetUsersQuery struct {
-	Role      *int16 `query:"role" validate:"numeric,min=0,max=2"`
+	Role      int16  `query:"role" validate:"numeric,min=0,max=2"`
 	Search    string `query:"search"`
 	Limit     int    `query:"limit" validate:"numeric,min=1,max=100"`
 	Page      int    `query:"page" validate:"numeric,min=1"`
