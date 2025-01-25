@@ -1,6 +1,9 @@
 package server
 
 import (
+	authController "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/auth/controller"
+	authRepo "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/auth/repository"
+	authSvc "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/auth/service"
 	userController "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/user/controller"
 	userRepo "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/user/repository"
 	userSvc "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/user/service"
@@ -8,6 +11,7 @@ import (
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/bcrypt"
 	errorhandler "github.com/ahargunyllib/freepass-be-bcc-2025/pkg/helpers/http/error_handler"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/helpers/http/response"
+	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/jwt"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/log"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/uuid"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/validator"
@@ -74,6 +78,9 @@ func (s *httpServer) MountRoutes(db *sqlx.DB) {
 	bcrypt := bcrypt.Bcrypt
 	uuid := uuid.UUID
 	validator := validator.Validator
+	jwt := jwt.Jwt
+
+	middleware := middlewares.NewMiddleware(jwt)
 
 	s.app.Get("/", func(c *fiber.Ctx) error {
 		return response.SendResponse(c, fiber.StatusOK, "Freepass BE BCC 2025")
@@ -87,10 +94,13 @@ func (s *httpServer) MountRoutes(db *sqlx.DB) {
 	})
 
 	userRepository := userRepo.NewUserRepository(db)
+	authRepository := authRepo.NewAuthRepository(db)
 
 	userService := userSvc.NewUserService(userRepository, validator, uuid, bcrypt)
+	authService := authSvc.NewAuthService(authRepository, validator, uuid, bcrypt, jwt)
 
 	userController.InitUserController(v1, userService)
+	authController.InitAuthController(v1, authService, middleware)
 
 	s.app.Use(func(c *fiber.Ctx) error {
 		return c.SendFile("./web/not-found.html")

@@ -1,6 +1,9 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+	"net/http"
+)
 
 type SerializableError interface {
 	Serialize() any
@@ -28,4 +31,34 @@ var ErrUserNotFound = &RequestError{
 var ErrCannotDeleteAdmin = &RequestError{
 	StatusCode: 403,
 	Err:        errors.New("cannot delete admin"),
+}
+
+var ErrInvalidCredentials = &RequestError{
+	StatusCode: 401,
+	Err:        errors.New("invalid credentials"),
+}
+
+var ErrNoBearerToken = &RequestError{
+	StatusCode: http.StatusUnauthorized,
+	Err:        errors.New("no bearer token provided"),
+}
+
+var ErrInvalidBearerToken = &RequestError{
+	StatusCode: http.StatusUnauthorized,
+	Err:        errors.New("invalid bearer token"),
+}
+
+var ErrExpiredBearerToken = &RequestError{
+	StatusCode: http.StatusUnauthorized,
+	Err:        errors.New("expired bearer token"),
+}
+
+var ErrBearerTokenNotActive = &RequestError{
+	StatusCode: http.StatusUnauthorized,
+	Err:        errors.New("bearer token not active"),
+}
+
+var ErrCantAccessResource = &RequestError{
+	StatusCode: http.StatusForbidden,
+	Err:        errors.New("you don't have access to this resource"),
 }
