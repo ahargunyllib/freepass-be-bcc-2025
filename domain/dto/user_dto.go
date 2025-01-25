@@ -11,12 +11,12 @@ type UserResponse struct {
 }
 
 type GetUsersQuery struct {
-	Role      int16  `query:"role" validate:"numeric,min=0,max=2"`
+	Role      int16  `query:"role" validate:"omitempty,numeric,min=0,max=2"`
 	Search    string `query:"search"`
-	Limit     int    `query:"limit" validate:"numeric,min=1,max=100"`
-	Page      int    `query:"page" validate:"numeric,min=1"`
-	SortOrder string `query:"sort_order" validate:"oneof=asc desc"`
-	SortBy    string `query:"sort_by" validate:"oneof=id name email role created_at updated_at"`
+	Limit     int    `query:"limit" validate:"omitempty,numeric,min=1,max=100"`
+	Page      int    `query:"page" validate:"omitempty,numeric,min=1"`
+	SortOrder string `query:"sort_order" validate:"omitempty,oneof=asc desc"`
+	SortBy    string `query:"sort_by" validate:"omitempty,oneof=id name email role created_at updated_at"`
 }
 
 type GetUsersResponse struct {

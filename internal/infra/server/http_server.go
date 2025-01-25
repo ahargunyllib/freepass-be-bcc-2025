@@ -1,10 +1,16 @@
 package server
 
 import (
+	userController "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/user/controller"
+	userRepo "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/user/repository"
+	userSvc "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/user/service"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/internal/middlewares"
+	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/bcrypt"
 	errorhandler "github.com/ahargunyllib/freepass-be-bcc-2025/pkg/helpers/http/error_handler"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/helpers/http/response"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/log"
+	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/uuid"
+	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/validator"
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
@@ -65,6 +71,10 @@ func (s *httpServer) MountMiddlewares() {
 }
 
 func (s *httpServer) MountRoutes(db *sqlx.DB) {
+	bcrypt := bcrypt.Bcrypt
+	uuid := uuid.UUID
+	validator := validator.Validator
+
 	s.app.Get("/", func(c *fiber.Ctx) error {
 		return response.SendResponse(c, fiber.StatusOK, "Freepass BE BCC 2025")
 	})
@@ -75,6 +85,12 @@ func (s *httpServer) MountRoutes(db *sqlx.DB) {
 	v1.Get("/", func(c *fiber.Ctx) error {
 		return response.SendResponse(c, fiber.StatusOK, "Freepass BE BCC 2025")
 	})
+
+	userRepository := userRepo.NewUserRepository(db)
+
+	userService := userSvc.NewUserService(userRepository, validator, uuid, bcrypt)
+
+	userController.InitUserController(v1, userService)
 
 	s.app.Use(func(c *fiber.Ctx) error {
 		return c.SendFile("./web/not-found.html")
