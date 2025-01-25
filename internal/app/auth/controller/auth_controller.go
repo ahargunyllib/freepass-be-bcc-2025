@@ -60,7 +60,7 @@ func (a *authController) GetSession(c *fiber.Ctx) error {
 		return domain.ErrExpiredBearerToken
 	}
 
-	query := dto.SessionQuery{
+	query := dto.GetSessionQuery{
 		UserID: claims.UserID,
 	}
 

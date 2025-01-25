@@ -17,10 +17,10 @@ type LoginResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
-type SessionQuery struct {
+type GetSessionQuery struct {
 	UserID uuid.UUID // assign from context
 }
 
-type SessionResponse struct {
+type GetSessionResponse struct {
 	User UserResponse `json:"user"`
 }

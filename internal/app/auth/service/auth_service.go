@@ -24,14 +24,14 @@ type authService struct {
 	jwt       jwt.CustomJwtInterface
 }
 
-func (a *authService) GetSession(ctx context.Context, query dto.SessionQuery) (dto.SessionResponse, error) {
+func (a *authService) GetSession(ctx context.Context, query dto.GetSessionQuery) (dto.GetSessionResponse, error) {
 	user, err := a.repo.FindByID(ctx, query.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return dto.SessionResponse{}, domain.ErrUserNotFound
+			return dto.GetSessionResponse{}, domain.ErrUserNotFound
 		}
 
-		return dto.SessionResponse{}, err
+		return dto.GetSessionResponse{}, err
 	}
 
 	userResponse := dto.UserResponse{
@@ -45,7 +45,7 @@ func (a *authService) GetSession(ctx context.Context, query dto.SessionQuery) (d
 		userResponse.ImageURI = &user.ImageURI.String
 	}
 
-	res := dto.SessionResponse{
+	res := dto.GetSessionResponse{
 		User: userResponse,
 	}
 
