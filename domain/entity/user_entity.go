@@ -15,5 +15,4 @@ type User struct {
 	ImageURI  sql.NullString `db:"image_uri" json:"image_uri"`
 	CreatedAt string         `db:"created_at" json:"created_at"`
 	UpdatedAt string         `db:"updated_at" json:"updated_at"`
-	DeletedAt sql.NullTime   `db:"deleted_at" json:"deleted_at"`
 }
