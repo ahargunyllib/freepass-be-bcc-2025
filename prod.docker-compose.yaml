@@ -24,8 +24,8 @@ services:
     image: ahargunyllib/freepass-be-bcc-2025:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.hmdtif-be.rule=Host(`staging-api.hmdtif-filkom.my.id`)"
-      - "traefik.http.routers.hmdtif-be.entrypoints=web"
+      - "traefik.http.routers.freepass-be-bcc-2025.rule=Host(`freepass-be-bcc-2025.ahargunyllib.tech`)"
+      - "traefik.http.routers.freepass-be-bcc-2025.entrypoints=web"
       - "com.centurylinklabs.watchtower.enable=true"
     env_file: "./config/.env"
     depends_on:
