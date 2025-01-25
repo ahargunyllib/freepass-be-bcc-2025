@@ -169,6 +169,57 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
 
+### Run in local environment
+1. Ensure you have [Go](https://go.dev/dl/) 1.23 or higher and [Task](https://taskfile.dev/installation/) installed on your machine:
+
+   ```bash
+   go version && task --version # windows
+   go version && go-task --version # unix
+   ```
+
+2. Create a copy of the `.env.example` file and rename it to `.env`:
+
+   ```bash
+   cp ./config/.env.example ./config/.env
+   ```
+
+   Update configuration values as needed.
+
+3. Install all dependencies, run docker compose, create database schema, and run database migrations:
+
+   ```bash
+   task
+   ```
+
+4. Initialize `air` configuration:
+
+	 ```bash
+	 air init
+
+	 # Update the `air.toml` file with the following configuration:
+	 # [build]
+	 # cmd = "go build -o ./tmp/main ./cmd/app" # for unix
+	 # cmd = "go build -o ./tmp/main.exe ./cmd/app" # for windows
+	 ```
+
+5. Run migrations:
+
+	 ```bash
+	 task migrate:up
+	 ```
+
+6. Seed the database:
+
+	 ```bash
+	 task db:seed
+	 ```
+
+7. Run the project in development mode:
+
+   ```bash
+   task dev
+   ```
+
 ## **📞** Contact
 
 Have any questions? You can contact either [Tyo](https://www.instagram.com/nandanatyo/) or [Ilham](https://www.instagram.com/iilham_akbar/).
