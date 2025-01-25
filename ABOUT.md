@@ -4,7 +4,7 @@
 
 ## Description
 
-This is a backend application for BCC Conference APi, part of Freepass challenge by BCC FILKOM UB. It is designed following the best practices and recommendations to ensure a clean, maintainable, and scalable codebase. It is also built with security in mind to protect against common security threats.
+This is a backend application for BCC Conference API, part of Freepass challenge by BCC FILKOM UB. It is designed following the best practices and recommendations to ensure a clean, maintainable, and scalable codebase. It is also built with security in mind to protect against common security threats.
 
 The application is built on [Go v1.23.4](https://tip.golang.org/doc/go1.22) and [PostgreSQL](https://www.postgresql.org/). It uses [Fiber](https://docs.gofiber.io/) as the HTTP framework and [pgx](https://github.com/jackc/pgx) as the driver and [sqlx](github.com/jmoiron/sqlx) as the query builder.
 
