@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/ahargunyllib/freepass-be-bcc-2025/internal/middlewares"
 	errorhandler "github.com/ahargunyllib/freepass-be-bcc-2025/pkg/helpers/http/error_handler"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/helpers/http/response"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/log"
@@ -56,7 +57,11 @@ func (s *httpServer) Start(port string) {
 }
 
 func (s *httpServer) MountMiddlewares() {
-
+	s.app.Use(middlewares.LoggerConfig())
+	s.app.Use(middlewares.Helmet())
+	s.app.Use(middlewares.Compress())
+	s.app.Use(middlewares.Cors())
+	s.app.Use(middlewares.RecoverConfig())
 }
 
 func (s *httpServer) MountRoutes(db *sqlx.DB) {

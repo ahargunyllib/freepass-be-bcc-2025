@@ -4,6 +4,7 @@ go 1.23.4
 
 require (
 	github.com/bytedance/sonic v1.12.7
+	github.com/gofiber/contrib/fiberzerolog v1.0.2
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/jmoiron/sqlx v1.4.0
