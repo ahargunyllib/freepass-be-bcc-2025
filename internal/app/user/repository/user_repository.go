@@ -48,18 +48,22 @@ func (u *userRepository) FindAll(
 ) ([]entity.User, error) {
 	users := []entity.User{}
 	query := "SELECT * FROM users WHERE 1=1"
+	args := []interface{}{}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (name ILIKE %s OR email ILIKE %s)", "'%"+search+"%'", "'%"+search+"%'")
+		query += fmt.Sprintf(" AND (name ILIKE $%d OR email ILIKE $%d)", len(args)+1, len(args)+1)
+		args = append(args, "%"+search+"%", "%"+search+"%")
 	}
 
 	if role != 0 {
-		query += fmt.Sprintf(" AND role = %d", role)
+		query += fmt.Sprintf(" AND role = $%d", len(args)+1)
+		args = append(args, role)
 	}
 
-	query += fmt.Sprintf(" ORDER BY %s %s LIMIT %d OFFSET %d", sortBy, sortOrder, limit, offset)
+	query += fmt.Sprintf(" ORDER BY $%d $%d LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2, len(args)+3, len(args)+4)
+	args = append(args, sortBy, sortOrder, limit, offset)
 
-	err := u.db.SelectContext(ctx, &users, query)
+	err := u.db.SelectContext(ctx, &users, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -70,16 +74,19 @@ func (u *userRepository) FindAll(
 func (u *userRepository) Count(ctx context.Context, search string, role int16) (int64, error) {
 	var count int64
 	query := "SELECT COUNT(*) FROM users WHERE 1=1"
+	args := []interface{}{}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (name ILIKE %s OR email ILIKE %s)", "'%"+search+"%'", "'%"+search+"%'")
+		query += fmt.Sprintf(" AND (name ILIKE $%d OR email ILIKE $%d)", len(args)+1, len(args)+1)
+		args = append(args, "%"+search+"%", "%"+search+"%")
 	}
 
 	if role != 0 {
-		query += fmt.Sprintf(" AND role = %d", role)
+		query += fmt.Sprintf(" AND role = $%d", len(args)+1)
+		args = append(args, role)
 	}
 
-	err := u.db.GetContext(ctx, &count, query)
+	err := u.db.GetContext(ctx, &count, query, args...)
 	if err != nil {
 		return 0, err
 	}
