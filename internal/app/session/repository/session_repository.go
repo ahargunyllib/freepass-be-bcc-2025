@@ -282,7 +282,7 @@ func (s *sessionRepository) CountAttendees(
 	}
 
 	if canceled {
-		query += " AND reason IS NOT NULL"
+		query += " AND reason IS NOT NULL AND deleted_reason IS NULL"
 	}
 	err := s.db.GetContext(ctx, &count, query, args...)
 	if err != nil {
