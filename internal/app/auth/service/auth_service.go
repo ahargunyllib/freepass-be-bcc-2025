@@ -9,7 +9,6 @@ import (
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/contracts"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/dto"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/entity"
-	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/enums"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/bcrypt"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/jwt"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/uuid"
@@ -38,7 +37,7 @@ func (a *authService) GetSession(ctx context.Context, query dto.GetSessionQuery)
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
-		Role:  enums.Roles[user.Role],
+		Role:  user.Role,
 	}
 
 	if user.ImageURI.Valid {
@@ -92,7 +91,11 @@ func (a *authService) Register(ctx context.Context, req dto.RegisterRequest) err
 	}
 
 	_, err := a.repo.FindByEmail(ctx, req.Email)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+	if err == nil {
+		return domain.ErrEmailAlreadyExists
+	}
+
+	if !errors.Is(err, sql.ErrNoRows) {
 		return err
 	}
 
