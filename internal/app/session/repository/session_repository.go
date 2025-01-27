@@ -299,7 +299,7 @@ func (s *sessionRepository) FindSessionAttendees(
 			sessions.tags as "session.tags", sessions.status as "session.status",
 			sessions.start_at as "session.start_at", sessions.end_at as "session.end_at",
 			sessions.room as "session.room", sessions.meeting_url as "session.meeting_url",
-			sessions.capacity as "session.capacity", sessions.image_uri as "session.image_uri",
+			sessions.capacity as "session.capacity", sessions.image_uri as "session.image_uri"
 		`
 	}
 
@@ -320,22 +320,24 @@ func (s *sessionRepository) FindSessionAttendees(
 	}
 
 	query += " WHERE 1=1"
+	args := []interface{}{}
 
 	if sessionID != uuid.Nil {
-		query += fmt.Sprintf(" AND session_id = %s", sessionID)
+		query += fmt.Sprintf(" AND session_id = $%d", len(args)+1)
+		args = append(args, sessionID)
 	}
 
 	if userID != uuid.Nil {
-		query += fmt.Sprintf(" AND user_id = %s", userID)
+		query += fmt.Sprintf(" AND user_id = $%d", len(args)+1)
+		args = append(args, userID)
 	}
-
+	
 	sessionAttendees := []entity.SessionAttendee{}
 	err := s.db.SelectContext(
 		ctx,
 		&sessionAttendees,
 		query,
-		sessionID,
-		userID,
+		args...,
 	)
 	if err != nil {
 		return nil, err
