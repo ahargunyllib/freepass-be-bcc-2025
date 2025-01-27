@@ -68,8 +68,8 @@ func (s *sessionRepository) FindAll(
 	args := []interface{}{}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (title ILIKE $%d)", len(args)+1)
-		args = append(args, "%"+search+"%")
+		query += fmt.Sprintf(" AND (title ILIKE %$%d%)", len(args)+1)
+		args = append(args, search)
 	}
 
 	if sessionType != 0 {
@@ -106,7 +106,7 @@ func (s *sessionRepository) FindAll(
 		"query": query,
 	}, "[SessionRepository] FindAll")
 
-	query += fmt.Sprintf(" ORDER BY $%d $d%d LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2, len(args)+3, len(args)+4)
+	query += fmt.Sprintf(" ORDER BY $%d $%d LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2, len(args)+3, len(args)+4)
 	args = append(args, sortBy, sortOrder, limit, offset)
 
 	err := s.db.SelectContext(ctx, &sessions, query, args...)
@@ -132,8 +132,8 @@ func (s *sessionRepository) Count(
 	args := []interface{}{}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (title ILIKE $%d)", len(args)+1)
-		args = append(args, "%"+search+"%")
+		query += fmt.Sprintf(" AND (title ILIKE %$%d%)", len(args)+1)
+		args = append(args, search)
 	}
 
 	if sessionType != 0 {
