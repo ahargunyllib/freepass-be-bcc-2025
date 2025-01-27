@@ -6,7 +6,7 @@ type UserResponse struct {
 	ID       uuid.UUID `json:"id"`
 	Name     string    `json:"name"`
 	Email    string    `json:"email"`
-	Role     string    `json:"role"`
+	Role     int16     `json:"role"`
 	ImageURI *string   `json:"image_uri"`
 }
 
@@ -20,7 +20,8 @@ type GetUsersQuery struct {
 }
 
 type GetUsersResponse struct {
-	Users []UserResponse `json:"users"`
+	Users []UserResponse     `json:"users"`
+	Meta  PaginationResponse `json:"meta"`
 }
 
 type GetUserQuery struct {

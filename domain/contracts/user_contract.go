@@ -10,6 +10,7 @@ import (
 
 type UserRepository interface {
 	FindAll(ctx context.Context, limit, offset int, sortBy, sortOrder, search string, role int16) ([]entity.User, error)
+	Count(ctx context.Context, search string, role int16) (int64, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*entity.User, error)
 	FindByEmail(ctx context.Context, email string) (*entity.User, error)
 	Create(ctx context.Context, user entity.User) error

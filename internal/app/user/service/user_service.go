@@ -9,7 +9,6 @@ import (
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/contracts"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/dto"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/entity"
-	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/enums"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/bcrypt"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/uuid"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/validator"
@@ -109,7 +108,7 @@ func (u *userService) GetUser(ctx context.Context, query dto.GetUserQuery) (dto.
 		ID:    user.ID,
 		Name:  user.Name,
 		Email: user.Email,
-		Role:  enums.Roles[user.Role],
+		Role:  user.Role,
 	}
 
 	if user.ImageURI.Valid {
@@ -158,8 +157,26 @@ func (u *userService) GetUsers(ctx context.Context, query dto.GetUsersQuery) (dt
 		return dto.GetUsersResponse{}, err
 	}
 
+	totalData, err := u.repo.Count(ctx, query.Search, query.Role)
+	if err != nil {
+		return dto.GetUsersResponse{}, err
+	}
+
+	totalPage := int(totalData) / query.Limit
+	if int(totalData)%query.Limit != 0 {
+		totalPage++
+	}
+
+	meta := dto.PaginationResponse{
+		TotalData: totalData,
+		TotalPage: totalPage,
+		Page:      query.Page,
+		Limit:     query.Limit,
+	}
+
 	res := dto.GetUsersResponse{
 		Users: make([]dto.UserResponse, 0, len(users)),
+		Meta:  meta,
 	}
 
 	for _, user := range users {
@@ -167,7 +184,7 @@ func (u *userService) GetUsers(ctx context.Context, query dto.GetUsersQuery) (dt
 			ID:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
-			Role:  enums.Roles[user.Role],
+			Role:  user.Role,
 		}
 
 		if user.ImageURI.Valid {

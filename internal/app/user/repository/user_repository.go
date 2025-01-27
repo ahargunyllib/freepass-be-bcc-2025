@@ -67,6 +67,26 @@ func (u *userRepository) FindAll(
 	return users, nil
 }
 
+func (u *userRepository) Count(ctx context.Context, search string, role int16) (int64, error) {
+	var count int64
+	query := "SELECT COUNT(*) FROM users WHERE 1=1"
+
+	if search != "" {
+		query += fmt.Sprintf(" AND (name ILIKE %s OR email ILIKE %s)", "'%"+search+"%'", "'%"+search+"%'")
+	}
+
+	if role != 0 {
+		query += fmt.Sprintf(" AND role = %d", role)
+	}
+
+	err := u.db.GetContext(ctx, &count, query)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (u *userRepository) FindByEmail(ctx context.Context, email string) (*entity.User, error) {
 	var user entity.User
 	err := u.db.GetContext(ctx, &user, "SELECT * FROM users WHERE email = $1", email)
