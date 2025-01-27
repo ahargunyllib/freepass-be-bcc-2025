@@ -1,12 +1,15 @@
 package middlewares
 
 import (
+	"database/sql"
+	"errors"
 	"strings"
 	"time"
 
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/jwt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func (m *Middleware) RequireAuth() fiber.Handler {
@@ -47,6 +50,36 @@ func (m *Middleware) RequireAuth() fiber.Handler {
 		}
 
 		ctx.Locals("claims", claims)
+
+		return ctx.Next()
+	}
+}
+
+func (m *Middleware) AuthorizationSessionProposal() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		claims, ok := ctx.Locals("claims").(jwt.Claims)
+		if !ok {
+			return domain.ErrNoBearerToken
+		}
+
+		id := ctx.Params("id")
+		uuid, err := uuid.Parse(id)
+		if err != nil {
+			return domain.ErrSessionNotFound
+		}
+
+		session, err := m.sessionRepo.FindByID(ctx.Context(), uuid)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return domain.ErrSessionNotFound
+			}
+
+			return err
+		}
+
+		if session.ProposerID != claims.UserID {
+			return domain.ErrCantAccessResource
+		}
 
 		return ctx.Next()
 	}
