@@ -60,8 +60,8 @@ func (u *userRepository) FindAll(
 		args = append(args, role)
 	}
 
-	query += fmt.Sprintf(" ORDER BY $%d $%d LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2, len(args)+3, len(args)+4)
-	args = append(args, sortBy, sortOrder, limit, offset)
+	query += fmt.Sprintf(" ORDER BY %s %s LIMIT $%d OFFSET $%d", sortBy, sortOrder, len(args)+1, len(args)+2)
+	args = append(args, limit, offset)
 
 	err := u.db.SelectContext(ctx, &users, query, args...)
 	if err != nil {
