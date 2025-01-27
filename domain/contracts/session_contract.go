@@ -45,6 +45,11 @@ type SessionRepository interface {
 		canceled bool,
 	) (int64, error)
 	FindSessionAttende(ctx context.Context, sessionID, userID uuid.UUID) (*entity.SessionAttendee, error)
+	FindSessionAttendees(
+		ctx context.Context,
+		sessionID uuid.UUID,
+		userID uuid.UUID,
+	) ([]entity.SessionAttendee, error)
 	CreateSessionAttende(ctx context.Context, sessionAttende *entity.SessionAttendee) error
 	UpdateSessionAttende(ctx context.Context, sessionAttende *entity.SessionAttendee) error
 }

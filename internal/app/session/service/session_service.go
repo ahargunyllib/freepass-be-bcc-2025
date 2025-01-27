@@ -233,6 +233,27 @@ func (s *sessionService) GetSession(
 		return dto.GetSessionEventResponse{}, err
 	}
 
+	sessionAttendees, err := s.repo.FindSessionAttendees(ctx, query.ID, uuid.Nil)
+	if err != nil {
+		return dto.GetSessionEventResponse{}, err
+	}
+
+	sessionAttendeeResponses := []dto.SessionAtendeeResponse{}
+
+	for _, sessionAttendee := range sessionAttendees {
+		sessionAttendeeResponses = append(sessionAttendeeResponses, dto.SessionAtendeeResponse{
+			SessionID: sessionAttendee.SessionID,
+			User: dto.UserResponse{
+				ID:    sessionAttendee.User.ID,
+				Name:  sessionAttendee.User.Name,
+				Email: sessionAttendee.User.Email,
+			},
+			Reason: &sessionAttendee.Reason.String,
+			Review: &sessionAttendee.Review.String,
+			UserID: sessionAttendee.User.ID,
+		})
+	}
+
 	sessionResponse := dto.SessionResponse{
 		ID:          session.ID,
 		Title:       session.Title,
@@ -251,6 +272,7 @@ func (s *sessionService) GetSession(
 			Name:  session.Proposer.Name,
 			Email: session.Proposer.Email,
 		},
+		SessionAtendees: []dto.SessionAtendeeResponse{},
 	}
 
 	res := dto.GetSessionEventResponse{
