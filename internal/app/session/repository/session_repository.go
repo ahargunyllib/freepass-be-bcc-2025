@@ -240,7 +240,10 @@ func (s *sessionRepository) CountAttendees(
 	canceled bool,
 ) (int64, error) {
 	var count int64
-	query := "SELECT COUNT(*) FROM session_attendees WHERE 1=1"
+	query := `SELECT COUNT(session_attendees.*),
+		sessions.start_at as start_at, sessions.end_at as end_at
+		FROM session_attendees JOIN sessions ON sessions.id=session_attendees.session_id
+		WHERE 1=1`
 
 	if sessionID != uuid.Nil {
 		query += fmt.Sprintf(" AND session_id = %s", sessionID)
@@ -251,11 +254,11 @@ func (s *sessionRepository) CountAttendees(
 	}
 
 	if !beforeAt.IsZero() {
-		query += fmt.Sprintf(" AND created_at < %s", beforeAt)
+		query += fmt.Sprintf(" AND end_at <= %s", beforeAt)
 	}
 
 	if !afterAt.IsZero() {
-		query += fmt.Sprintf(" AND created_at > %s", afterAt)
+		query += fmt.Sprintf(" AND start_at >= %s", afterAt)
 	}
 
 	if canceled {
