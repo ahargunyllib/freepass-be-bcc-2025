@@ -20,6 +20,7 @@ func LoggerConfig() fiber.Handler {
 			"latency",
 			"status",
 			"method",
+			"error",
 		},
 		Messages: []string{
 			"[LoggerMiddleware.LoggerConfig] Server error",
