@@ -15,8 +15,8 @@ type CustomJwtInterface interface {
 
 type Claims struct {
 	jwt.RegisteredClaims
-	UserID uuid.UUID
-	Role   int16
+	UserID uuid.UUID `json:"user_id"`
+	Role   int16     `json:"role"`
 }
 
 type CustomJwtStruct struct {
