@@ -233,13 +233,22 @@ func (s *sessionRepository) UpdateSessionAttende(ctx context.Context, sessionAtt
 
 func (s *sessionRepository) CountAttendees(
 	ctx context.Context,
+	sessionID uuid.UUID,
 	userID uuid.UUID,
 	beforeAt time.Time,
 	afterAt time.Time,
 	canceled bool,
 ) (int64, error) {
 	var count int64
-	query := "SELECT COUNT(*) FROM session_attendees WHERE user_id = $1"
+	query := "SELECT COUNT(*) FROM session_attendees WHERE 1=1"
+
+	if sessionID != uuid.Nil {
+		query += fmt.Sprintf(" AND session_id = %s", sessionID)
+	}
+
+	if userID != uuid.Nil {
+		query += fmt.Sprintf(" AND user_id = %s", userID)
+	}
 
 	if !beforeAt.IsZero() {
 		query += fmt.Sprintf(" AND created_at < %s", beforeAt)

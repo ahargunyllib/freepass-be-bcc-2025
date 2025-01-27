@@ -38,6 +38,7 @@ type SessionRepository interface {
 
 	CountAttendees(
 		ctx context.Context,
+		sessionID uuid.UUID,
 		userID uuid.UUID,
 		beforeAt time.Time,
 		afterAt time.Time,

@@ -28,7 +28,6 @@ type Session struct {
 	DeletedAt        sql.NullTime      `db:"deleted_at" json:"deleted_at"`
 	DeletedReason    sql.NullString    `db:"deleted_reason" json:"deleted_reason"`
 	Proposer         User              `db:"proposer" json:"proposer"`
-	SessionAttendees []SessionAttendee `db:"session_atendees" json:"session_atendees"`
 }
 
 type SessionAttendee struct {

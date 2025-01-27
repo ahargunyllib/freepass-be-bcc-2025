@@ -12,14 +12,15 @@ import (
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/dto"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/entity"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/log"
-	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/uuid"
+	uuidPkg "github.com/ahargunyllib/freepass-be-bcc-2025/pkg/uuid"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/validator"
+	"github.com/google/uuid"
 )
 
 type sessionService struct {
 	repo      contracts.SessionRepository
 	validator validator.ValidatorInterface
-	uuid      uuid.CustomUUIDInterface
+	uuidPkg   uuidPkg.CustomUUIDInterface
 }
 
 func (s *sessionService) AcceptSession(
@@ -138,7 +139,7 @@ func (s *sessionService) CreateSession(ctx context.Context, req dto.CreateSessio
 		return domain.ErrSessionProposalLimit
 	}
 
-	id, err := s.uuid.NewV7()
+	id, err := s.uuidPkg.NewV7()
 	if err != nil {
 		return err
 	}
@@ -542,16 +543,35 @@ func (s *sessionService) RegisterSession(
 		return domain.ErrSessionAlreadyEnded
 	}
 
-	if len(session.SessionAttendees) >= session.Capacity {
-		return domain.ErrSessionFull
-	}
-
-	count, err := s.repo.CountAttendees(ctx, req.UserID, session.EndAt, session.StartAt, true)
+	countSessionAttendees, err := s.repo.CountAttendees(
+		ctx,
+		query.SessionID,
+		uuid.Nil,
+		session.EndAt,
+		session.StartAt,
+		false,
+	)
 	if err != nil {
 		return err
 	}
 
-	if count > 0 {
+	if int(countSessionAttendees) >= session.Capacity {
+		return domain.ErrSessionFull
+	}
+
+	countUserSessionTimeConflict, err := s.repo.CountAttendees(
+		ctx,
+		uuid.Nil,
+		req.UserID,
+		session.EndAt,
+		session.StartAt,
+		true,
+	)
+	if err != nil {
+		return err
+	}
+
+	if countUserSessionTimeConflict > 0 {
 		return domain.ErrSessionTimeConflict
 	}
 
@@ -730,11 +750,11 @@ func (s *sessionService) DeleteReviewSession(
 func NewSessionService(
 	repo contracts.SessionRepository,
 	validator validator.ValidatorInterface,
-	uuid uuid.CustomUUIDInterface,
+	uuidPkg uuidPkg.CustomUUIDInterface,
 ) contracts.SessionService {
 	return &sessionService{
 		repo:      repo,
 		validator: validator,
-		uuid:      uuid,
+		uuidPkg:   uuidPkg,
 	}
 }
