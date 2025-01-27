@@ -147,3 +147,7 @@ type DeleteReviewSessionQuery struct {
 type DeleteReviewSessionRequest struct {
 	Reason string `json:"reason" validate:"required,min=3,max=255"`
 }
+
+type CancelSessionQuery struct {
+	ID uuid.UUID `param:"id" validate:"required,uuid"`
+}

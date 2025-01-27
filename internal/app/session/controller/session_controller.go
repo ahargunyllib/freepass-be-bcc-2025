@@ -56,6 +56,13 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 		middleware.RequirePermission([]int16{2}), // admin
 		controller.RejectSession,
 	)
+	sessionRouter.Post(
+		"/:id/cancel",
+		middleware.RequireAuth(),
+		middleware.RequirePermission([]int16{2}), // admin
+		controller.CancelSession,
+	)
+
 
 	sessionRouter.Post(
 		"/:session_id/register",
@@ -329,6 +336,20 @@ func (c *sessionController) RemoveReview(ctx *fiber.Ctx) error {
 	}
 
 	err := c.service.DeleteReviewSession(ctx.Context(), query, req)
+	if err != nil {
+		return err
+	}
+
+	return response.SendResponse(ctx, fiber.StatusOK, nil)
+}
+
+func (c *sessionController) CancelSession(ctx *fiber.Ctx) error {
+	var query dto.CancelSessionQuery
+	if err := ctx.ParamsParser(&query); err != nil {
+		return err
+	}
+
+	err := c.service.CancelSession(ctx.Context(), query)
 	if err != nil {
 		return err
 	}

@@ -60,6 +60,7 @@ type SessionService interface {
 	CreateSession(ctx context.Context, req dto.CreateSessionRequest) error
 	UpdateSession(ctx context.Context, req dto.UpdateSessionRequest) error
 	DeleteSession(ctx context.Context, query dto.DeleteSessionQuery) error
+	CancelSession(ctx context.Context, query dto.CancelSessionQuery) error
 	AcceptSession(ctx context.Context, query dto.AcceptSessionQuery, req dto.AcceptSessionRequest) error
 	RejectSession(ctx context.Context, query dto.RejectSessionQuery, req dto.RejectSessionRequest) error
 

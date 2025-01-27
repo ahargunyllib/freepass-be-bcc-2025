@@ -769,6 +769,34 @@ func (s *sessionService) DeleteReviewSession(
 	return nil
 }
 
+func (s *sessionService) CancelSession(
+	ctx context.Context,
+	query dto.CancelSessionQuery,
+) error {
+	valErr := s.validator.Validate(query)
+	if valErr != nil {
+		return valErr
+	}
+
+	session, err := s.repo.FindByID(ctx, query.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ErrSessionNotFound
+		}
+
+		return err
+	}
+
+	session.DeletedAt = sql.NullTime{Time: time.Now(), Valid: true}
+
+	err = s.repo.Update(ctx, session)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func NewSessionService(
 	repo contracts.SessionRepository,
 	validator validator.ValidatorInterface,

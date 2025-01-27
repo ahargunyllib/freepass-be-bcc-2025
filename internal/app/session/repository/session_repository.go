@@ -98,7 +98,7 @@ func (s *sessionRepository) FindAll(
 		"query": query,
 	}, "[SessionRepository] FindAll")
 
-	query += fmt.Sprintf(" ORDER BY %s %s LIMIT %d OFFSET %d", sortBy, sortOrder, limit, offset)
+	query += fmt.Sprintf(" AND deleted_at IS NULL ORDER BY %s %s LIMIT %d OFFSET %d", sortBy, sortOrder, limit, offset)
 
 	err := s.db.SelectContext(ctx, &sessions, query)
 	if err != nil {
@@ -149,9 +149,7 @@ func (s *sessionRepository) Count(
 		query += fmt.Sprintf(" AND status = %d", status)
 	}
 
-	log.Info(log.LogInfo{
-		query: query,
-	}, "[SessionRepository] Count")
+	query += " AND deleted_at IS NULL"
 
 	err := s.db.GetContext(ctx, &count, query)
 	if err != nil {
@@ -166,7 +164,7 @@ func (s *sessionRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity
 		sessions.*, proposer.id as "proposer.id", proposer.name as "proposer.name",
 		proposer.email as "proposer.email", proposer.role as "proposer.role"
 		FROM sessions JOIN users proposer ON proposer.id=sessions.proposer_id
-		WHERE id = $1
+		WHERE id = $1 AND deleted_at IS NULL
 	`
 
 	var session entity.Session
