@@ -162,8 +162,15 @@ func (s *sessionRepository) Count(
 }
 
 func (s *sessionRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity.Session, error) {
+	query := `SELECT
+		sessions.*, proposer.id as "proposer.id", proposer.name as "proposer.name",
+		proposer.email as "proposer.email", proposer.role as "proposer.role"
+		FROM sessions JOIN users proposer ON proposer.id=sessions.proposer_id
+		WHERE id = $1
+	`
+
 	var session entity.Session
-	err := s.db.GetContext(ctx, &session, "SELECT * FROM sessions WHERE id = $1", id)
+	err := s.db.GetContext(ctx, &session, query, id)
 	if err != nil {
 		return nil, err
 	}
