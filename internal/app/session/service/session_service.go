@@ -539,7 +539,7 @@ func (s *sessionService) RegisterSession(
 		return err
 	}
 
-	pastSessionAttendee, err := s.repo.FindSessionAttende(ctx, query.SessionID, req.UserID)
+	pastSessionAttendee, err := s.repo.FindSessionAttendee(ctx, query.SessionID, req.UserID)
 	if err == nil {
 		if pastSessionAttendee.Reason.Valid {
 			return domain.ErrSessionCancelled
@@ -602,7 +602,7 @@ func (s *sessionService) RegisterSession(
 		UserID:    req.UserID,
 	}
 
-	err = s.repo.CreateSessionAttende(ctx, &sessionAttendee)
+	err = s.repo.CreateSessionAttendee(ctx, &sessionAttendee)
 	if err != nil {
 		return err
 	}
@@ -642,7 +642,7 @@ func (s *sessionService) UnregisterSession(
 		return domain.ErrSessionAlreadyEnded
 	}
 
-	sessionAttendee, err := s.repo.FindSessionAttende(ctx, query.SessionID, req.UserID)
+	sessionAttendee, err := s.repo.FindSessionAttendee(ctx, query.SessionID, req.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.ErrSessionNotRegistered
@@ -657,7 +657,7 @@ func (s *sessionService) UnregisterSession(
 
 	sessionAttendee.Reason = sql.NullString{String: req.Reason, Valid: true}
 
-	err = s.repo.UpdateSessionAttende(ctx, sessionAttendee)
+	err = s.repo.UpdateSessionAttendee(ctx, sessionAttendee)
 	if err != nil {
 		return err
 	}
@@ -688,7 +688,7 @@ func (s *sessionService) ReviewSession(
 		return domain.ErrSessionNotAccepted
 	}
 
-	sessionAttendee, err := s.repo.FindSessionAttende(ctx, query.SessionID, req.UserID)
+	sessionAttendee, err := s.repo.FindSessionAttendee(ctx, query.SessionID, req.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.ErrSessionNotRegistered
@@ -742,7 +742,7 @@ func (s *sessionService) DeleteReviewSession(
 		return domain.ErrSessionNotAccepted
 	}
 
-	sessionAttendee, err := s.repo.FindSessionAttende(ctx, query.SessionID, query.UserID)
+	sessionAttendee, err := s.repo.FindSessionAttendee(ctx, query.SessionID, query.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.ErrSessionNotRegistered

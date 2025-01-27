@@ -164,7 +164,7 @@ func (s *sessionRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity
 		sessions.*, proposer.id as "proposer.id", proposer.name as "proposer.name",
 		proposer.email as "proposer.email", proposer.role as "proposer.role"
 		FROM sessions JOIN users proposer ON proposer.id=sessions.proposer_id
-		WHERE id = $1 AND deleted_at IS NULL
+		WHERE sessions.id = $1 AND deleted_at IS NULL
 	`
 
 	var session entity.Session
@@ -195,7 +195,7 @@ func (s *sessionRepository) Update(ctx context.Context, session *entity.Session)
 	return nil
 }
 
-func (s *sessionRepository) CreateSessionAttende(ctx context.Context, sessionAttende *entity.SessionAttendee) error {
+func (s *sessionRepository) CreateSessionAttendee(ctx context.Context, sessionAttendee *entity.SessionAttendee) error {
 	_, err := s.db.NamedExecContext(
 		ctx,
 		`
@@ -203,7 +203,7 @@ func (s *sessionRepository) CreateSessionAttende(ctx context.Context, sessionAtt
 		(session_id, user_id)
 		VALUES (:session_id, :user_id)
 		`,
-		sessionAttende,
+		sessionAttendee,
 	)
 	if err != nil {
 		return err
@@ -212,7 +212,7 @@ func (s *sessionRepository) CreateSessionAttende(ctx context.Context, sessionAtt
 	return nil
 }
 
-func (s *sessionRepository) UpdateSessionAttende(ctx context.Context, sessionAttende *entity.SessionAttendee) error {
+func (s *sessionRepository) UpdateSessionAttendee(ctx context.Context, sessionAttendee *entity.SessionAttendee) error {
 	_, err := s.db.NamedExecContext(
 		ctx,
 		`
@@ -220,7 +220,7 @@ func (s *sessionRepository) UpdateSessionAttende(ctx context.Context, sessionAtt
 		SET review = :review, reason = :reason, deleted_reason = :deleted_reason
 		WHERE session_id = :session_id AND user_id = :user_id
 		`,
-		sessionAttende,
+		sessionAttendee,
 	)
 	if err != nil {
 		return err
@@ -270,7 +270,7 @@ func (s *sessionRepository) CountAttendees(
 	return count, nil
 }
 
-func (s *sessionRepository) FindSessionAttende(ctx context.Context, sessionID, userID uuid.UUID) (*entity.SessionAttendee, error) {
+func (s *sessionRepository) FindSessionAttendee(ctx context.Context, sessionID, userID uuid.UUID) (*entity.SessionAttendee, error) {
 	var sessionAttende entity.SessionAttendee
 	err := s.db.GetContext(
 		ctx,
