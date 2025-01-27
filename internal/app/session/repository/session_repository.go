@@ -109,7 +109,7 @@ func (s *sessionRepository) FindAll(
 	query += fmt.Sprintf(" ORDER BY $%d $d%d LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2, len(args)+3, len(args)+4)
 	args = append(args, sortBy, sortOrder, limit, offset)
 
-	err := s.db.SelectContext(ctx, &sessions, query)
+	err := s.db.SelectContext(ctx, &sessions, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -129,38 +129,46 @@ func (s *sessionRepository) Count(
 ) (int64, error) {
 	var count int64
 	query := "SELECT COUNT(*) FROM sessions WHERE 1=1"
+	args := []interface{}{}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (title ILIKE %s)", "'%"+search+"%'")
+		query += fmt.Sprintf(" AND (title ILIKE $%d)", len(args)+1)
+		args = append(args, "%"+search+"%")
 	}
 
 	if sessionType != 0 {
-		query += fmt.Sprintf(" AND type = %d", sessionType)
+		query += fmt.Sprintf(" AND type = $%d", len(args)+1)
+		args = append(args, sessionType)
 	}
 
 	if tags != 0 {
-		query += fmt.Sprintf(" AND (tags & %d) = %d", tags, tags)
+		query += fmt.Sprintf(" AND (tags & $%d) = $%d", len(args)+1, len(args)+1)
+		args = append(args, tags, tags)
 	}
 
 	if !beforeAt.IsZero() {
-		query += fmt.Sprintf(" AND start_at < %s", beforeAt)
+		query += fmt.Sprintf(" AND start_at < $%d", len(args)+1)
+		args = append(args, beforeAt)
 	}
 
 	if !afterAt.IsZero() {
-		query += fmt.Sprintf(" AND end_at > %s", afterAt)
+		query += fmt.Sprintf(" AND end_at > $%d", len(args)+1)
+		args = append(args, afterAt)
 	}
 
 	if proposerID != uuid.Nil {
-		query += fmt.Sprintf(" AND proposer_id = '%s'", proposerID.String())
+		query += fmt.Sprintf(" AND proposer_id = $%d", len(args)+1)
+		args = append(args, proposerID)
 	}
 
 	if status != 0 {
-		query += fmt.Sprintf(" AND status = %d", status)
+		query += fmt.Sprintf(" AND status = $%d", len(args)+1)
+		args = append(args, status)
 	}
 
 	query += " AND deleted_at IS NULL"
 
-	err := s.db.GetContext(ctx, &count, query)
+	err := s.db.GetContext(ctx, &count, query, args...)
 	if err != nil {
 		return 0, err
 	}
