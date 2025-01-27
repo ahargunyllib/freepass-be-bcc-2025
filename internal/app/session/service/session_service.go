@@ -497,6 +497,236 @@ func (s *sessionService) UpdateSession(ctx context.Context, req dto.UpdateSessio
 	return nil
 }
 
+func (s *sessionService) RegisterSession(
+	ctx context.Context,
+	query dto.RegisterSessionQuery,
+	req dto.RegisterSessionRequest,
+) error {
+	valErr := s.validator.Validate(query)
+	if valErr != nil {
+		return valErr
+	}
+
+	session, err := s.repo.FindByID(ctx, query.SessionID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ErrSessionNotFound
+		}
+
+		return err
+	}
+
+	pastSessionAttendee, err := s.repo.FindSessionAttende(ctx, query.SessionID, req.UserID)
+	if err == nil {
+		if pastSessionAttendee.Reason.Valid {
+			return domain.ErrSessionCancelled
+		}
+
+		return domain.ErrSessionAlreadyRegistered
+	}
+
+	if !errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+
+	if session.Status != 2 {
+		return domain.ErrSessionNotAccepted
+	}
+
+	now := time.Now()
+	if session.StartAt.Before(now) {
+		return domain.ErrSessionAlreadyStarted
+	}
+
+	if session.EndAt.Before(now) {
+		return domain.ErrSessionAlreadyEnded
+	}
+
+	if len(session.SessionAttendees) >= session.Capacity {
+		return domain.ErrSessionFull
+	}
+
+	count, err := s.repo.CountAttendees(ctx, req.UserID, session.EndAt, session.StartAt, true)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		return domain.ErrSessionTimeConflict
+	}
+
+	sessionAttendee := entity.SessionAttendee{
+		SessionID: query.SessionID,
+		UserID:    req.UserID,
+	}
+
+	err = s.repo.CreateSessionAttende(ctx, &sessionAttendee)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *sessionService) UnregisterSession(
+	ctx context.Context,
+	query dto.UnregisterSessionQuery,
+	req dto.UnregisterSessionRequest,
+) error {
+	valErr := s.validator.Validate(query)
+	if valErr != nil {
+		return valErr
+	}
+
+	session, err := s.repo.FindByID(ctx, query.SessionID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ErrSessionNotFound
+		}
+
+		return err
+	}
+
+	if session.Status != 2 {
+		return domain.ErrSessionNotAccepted
+	}
+
+	now := time.Now()
+	if session.StartAt.Before(now) {
+		return domain.ErrSessionAlreadyStarted
+	}
+
+	if session.EndAt.Before(now) {
+		return domain.ErrSessionAlreadyEnded
+	}
+
+	sessionAttendee, err := s.repo.FindSessionAttende(ctx, query.SessionID, req.UserID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ErrSessionNotRegistered
+		}
+
+		return err
+	}
+
+	if sessionAttendee.Reason.Valid {
+		return domain.ErrSessionCancelled
+	}
+
+	sessionAttendee.Reason = sql.NullString{String: req.Reason, Valid: true}
+
+	err = s.repo.UpdateSessionAttende(ctx, sessionAttendee)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *sessionService) ReviewSession(
+	ctx context.Context,
+	query dto.ReviewSessionQuery,
+	req dto.ReviewSessionRequest,
+) error {
+	valErr := s.validator.Validate(req)
+	if valErr != nil {
+		return valErr
+	}
+
+	session, err := s.repo.FindByID(ctx, query.SessionID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ErrSessionNotFound
+		}
+
+		return err
+	}
+
+	if session.Status != 2 {
+		return domain.ErrSessionNotAccepted
+	}
+
+	sessionAttendee, err := s.repo.FindSessionAttende(ctx, query.SessionID, req.UserID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ErrSessionNotRegistered
+		}
+
+		return err
+	}
+
+	if sessionAttendee.Reason.Valid {
+		return domain.ErrSessionCancelled
+	}
+
+	if sessionAttendee.DeletedReason.Valid {
+		return domain.ErrReviewDeleted
+	}
+
+	if sessionAttendee.Review.Valid {
+		return domain.ErrSessionAlreadyReviewed
+	}
+
+	sessionAttendee.Review = sql.NullString{String: req.Review, Valid: true}
+
+	err = s.repo.Update(ctx, session)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *sessionService) DeleteReviewSession(
+	ctx context.Context,
+	query dto.DeleteReviewSessionQuery,
+	req dto.DeleteReviewSessionRequest,
+) error {
+	valErr := s.validator.Validate(req)
+	if valErr != nil {
+		return valErr
+	}
+
+	session, err := s.repo.FindByID(ctx, query.SessionID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ErrSessionNotFound
+		}
+
+		return err
+	}
+
+	if session.Status != 2 {
+		return domain.ErrSessionNotAccepted
+	}
+
+	sessionAttendee, err := s.repo.FindSessionAttende(ctx, query.SessionID, query.UserID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ErrSessionNotRegistered
+		}
+
+		return err
+	}
+
+	if sessionAttendee.Reason.Valid {
+		return domain.ErrSessionCancelled
+	}
+
+	if sessionAttendee.DeletedReason.Valid {
+		return domain.ErrReviewDeleted
+	}
+
+	sessionAttendee.DeletedReason = sql.NullString{String: req.Reason, Valid: true}
+
+	err = s.repo.Update(ctx, session)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func NewSessionService(
 	repo contracts.SessionRepository,
 	validator validator.ValidatorInterface,

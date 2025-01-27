@@ -56,6 +56,31 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 		middleware.RequirePermission([]int16{2}), // admin
 		controller.RejectSession,
 	)
+
+	sessionRouter.Post(
+		"/:session_id/register",
+		middleware.RequireAuth(),
+		middleware.RequirePermission([]int16{1}), // user
+		controller.RegisterSession,
+	)
+	sessionRouter.Post(
+		"/:sesion_id/unregister",
+		middleware.RequireAuth(),
+		middleware.RequirePermission([]int16{1}), // user
+		controller.UnregisterSession,
+	)
+	sessionRouter.Post(
+		"/:sesion_id/review",
+		middleware.RequireAuth(),
+		middleware.RequirePermission([]int16{1}), // user
+		controller.ReviewSession,
+	)
+	sessionRouter.Post(
+		"/:sesion_id/review/:user_id/remove",
+		middleware.RequireAuth(),
+		middleware.RequirePermission([]int16{2}), // admin
+		controller.RemoveReview,
+	)
 }
 
 /*
@@ -207,6 +232,103 @@ func (c *sessionController) RejectSession(ctx *fiber.Ctx) error {
 	}
 
 	err := c.service.RejectSession(ctx.Context(), query, req)
+	if err != nil {
+		return err
+	}
+
+	return response.SendResponse(ctx, fiber.StatusOK, nil)
+}
+
+func (c *sessionController) RegisterSession(ctx *fiber.Ctx) error {
+	var query dto.RegisterSessionQuery
+	if err := ctx.ParamsParser(&query); err != nil {
+		return err
+	}
+
+	var req dto.RegisterSessionRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return err
+	}
+
+	claims, ok := ctx.Locals("claims").(jwt.Claims)
+	if !ok {
+		return response.SendResponse(ctx, fiber.StatusUnauthorized, nil)
+	}
+
+	req.UserID = claims.UserID
+
+	err := c.service.RegisterSession(ctx.Context(), query, req)
+	if err != nil {
+		return err
+	}
+
+	return response.SendResponse(ctx, fiber.StatusOK, nil)
+}
+
+func (c *sessionController) UnregisterSession(ctx *fiber.Ctx) error {
+	var query dto.UnregisterSessionQuery
+	if err := ctx.ParamsParser(&query); err != nil {
+		return err
+	}
+
+	var req dto.UnregisterSessionRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return err
+	}
+
+	claims, ok := ctx.Locals("claims").(jwt.Claims)
+	if !ok {
+		return response.SendResponse(ctx, fiber.StatusUnauthorized, nil)
+	}
+
+	req.UserID = claims.UserID
+
+	err := c.service.UnregisterSession(ctx.Context(), query, req)
+	if err != nil {
+		return err
+	}
+
+	return response.SendResponse(ctx, fiber.StatusOK, nil)
+}
+
+func (c *sessionController) ReviewSession(ctx *fiber.Ctx) error {
+	var query dto.ReviewSessionQuery
+	if err := ctx.ParamsParser(&query); err != nil {
+		return err
+	}
+
+	var req dto.ReviewSessionRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return err
+	}
+
+	claims, ok := ctx.Locals("claims").(jwt.Claims)
+	if !ok {
+		return response.SendResponse(ctx, fiber.StatusUnauthorized, nil)
+	}
+
+	req.UserID = claims.UserID
+
+	err := c.service.ReviewSession(ctx.Context(), query, req)
+	if err != nil {
+		return err
+	}
+
+	return response.SendResponse(ctx, fiber.StatusOK, nil)
+}
+
+func (c *sessionController) RemoveReview(ctx *fiber.Ctx) error {
+	var query dto.DeleteReviewSessionQuery
+	if err := ctx.ParamsParser(&query); err != nil {
+		return err
+	}
+
+	var req dto.DeleteReviewSessionRequest
+	if err := ctx.BodyParser(&req); err != nil {
+		return err
+	}
+
+	err := c.service.DeleteReviewSession(ctx.Context(), query, req)
 	if err != nil {
 		return err
 	}

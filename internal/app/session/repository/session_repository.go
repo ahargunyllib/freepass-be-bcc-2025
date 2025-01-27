@@ -190,6 +190,85 @@ func (s *sessionRepository) Update(ctx context.Context, session *entity.Session)
 	return nil
 }
 
+func (s *sessionRepository) CreateSessionAttende(ctx context.Context, sessionAttende *entity.SessionAttendee) error {
+	_, err := s.db.NamedExecContext(
+		ctx,
+		`
+		INSERT INTO session_attendees
+		(session_id, user_id)
+		VALUES (:session_id, :user_id)
+		`,
+		sessionAttende,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *sessionRepository) UpdateSessionAttende(ctx context.Context, sessionAttende *entity.SessionAttendee) error {
+	_, err := s.db.NamedExecContext(
+		ctx,
+		`
+		UPDATE session_attendees
+		SET review = :review, reason = :reason, deleted_reason = :deleted_reason
+		WHERE session_id = :session_id AND user_id = :user_id
+		`,
+		sessionAttende,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *sessionRepository) CountAttendees(
+	ctx context.Context,
+	userID uuid.UUID,
+	beforeAt time.Time,
+	afterAt time.Time,
+	canceled bool,
+) (int64, error) {
+	var count int64
+	query := "SELECT COUNT(*) FROM session_attendees WHERE user_id = $1"
+
+	if !beforeAt.IsZero() {
+		query += fmt.Sprintf(" AND created_at < %s", beforeAt)
+	}
+
+	if !afterAt.IsZero() {
+		query += fmt.Sprintf(" AND created_at > %s", afterAt)
+	}
+
+	if canceled {
+		query += " AND reason IS NOT NULL"
+	}
+	err := s.db.GetContext(ctx, &count, query, userID)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (s *sessionRepository) FindSessionAttende(ctx context.Context, sessionID, userID uuid.UUID) (*entity.SessionAttendee, error) {
+	var sessionAttende entity.SessionAttendee
+	err := s.db.GetContext(
+		ctx,
+		&sessionAttende,
+		"SELECT * FROM session_attendees WHERE session_id = $1 AND user_id = $2",
+		sessionID,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &sessionAttende, nil
+}
+
 func NewSessionRepository(db *sqlx.DB) contracts.SessionRepository {
 	return &sessionRepository{
 		db: db,

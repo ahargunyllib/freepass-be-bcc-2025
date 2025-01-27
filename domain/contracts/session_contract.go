@@ -35,6 +35,17 @@ type SessionRepository interface {
 	Create(ctx context.Context, session *entity.Session) error
 	Update(ctx context.Context, session *entity.Session) error
 	Delete(ctx context.Context, id uuid.UUID) error
+
+	CountAttendees(
+		ctx context.Context,
+		userID uuid.UUID,
+		beforeAt time.Time,
+		afterAt time.Time,
+		canceled bool,
+	) (int64, error)
+	FindSessionAttende(ctx context.Context, sessionID, userID uuid.UUID) (*entity.SessionAttendee, error)
+	CreateSessionAttende(ctx context.Context, sessionAttende *entity.SessionAttendee) error
+	UpdateSessionAttende(ctx context.Context, sessionAttende *entity.SessionAttendee) error
 }
 
 type SessionService interface {
@@ -45,4 +56,9 @@ type SessionService interface {
 	DeleteSession(ctx context.Context, query dto.DeleteSessionQuery) error
 	AcceptSession(ctx context.Context, query dto.AcceptSessionQuery, req dto.AcceptSessionRequest) error
 	RejectSession(ctx context.Context, query dto.RejectSessionQuery, req dto.RejectSessionRequest) error
+
+	RegisterSession(ctx context.Context, query dto.RegisterSessionQuery, req dto.RegisterSessionRequest) error
+	UnregisterSession(ctx context.Context, query dto.UnregisterSessionQuery, req dto.UnregisterSessionRequest) error
+	ReviewSession(ctx context.Context, query dto.ReviewSessionQuery, req dto.ReviewSessionRequest) error
+	DeleteReviewSession(ctx context.Context, query dto.DeleteReviewSessionQuery, req dto.DeleteReviewSessionRequest) error
 }

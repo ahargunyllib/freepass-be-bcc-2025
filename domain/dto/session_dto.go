@@ -7,19 +7,29 @@ import (
 )
 
 type SessionResponse struct {
-	ID          uuid.UUID    `json:"id"`
-	Title       string       `json:"title"`
-	Description *string      `json:"description"`
-	Type        int16        `json:"type"`
-	Tags        []string     `json:"tags"`
-	StartAt     time.Time    `json:"start_at"`
-	EndAt       time.Time    `json:"end_at"`
-	Room        *string      `json:"room"`
-	Status      int16        `json:"status"`
-	MeetingURL  *string      `json:"meeting_url"`
-	Capacity    int          `json:"capacity"`
-	ImageURI    *string      `json:"image_uri"`
-	Proposer    UserResponse `json:"proposer"`
+	ID              uuid.UUID                `json:"id"`
+	Title           string                   `json:"title"`
+	Description     *string                  `json:"description"`
+	Type            int16                    `json:"type"`
+	Tags            []string                 `json:"tags"`
+	StartAt         time.Time                `json:"start_at"`
+	EndAt           time.Time                `json:"end_at"`
+	Room            *string                  `json:"room"`
+	Status          int16                    `json:"status"`
+	MeetingURL      *string                  `json:"meeting_url"`
+	Capacity        int                      `json:"capacity"`
+	ImageURI        *string                  `json:"image_uri"`
+	Proposer        UserResponse             `json:"proposer"`
+	SessionAtendees []SessionAtendeeResponse `json:"session_atendees"`
+}
+
+type SessionAtendeeResponse struct {
+	SessionID uuid.UUID `json:"session_id"`
+	UserID    uuid.UUID `json:"user_id"`
+	Review    *string   `json:"review"`
+	Reason    *string   `json:"reason"`
+	User      UserResponse
+	Session   SessionResponse
 }
 
 type GetSessionsQuery struct {
@@ -100,5 +110,40 @@ type RejectSessionQuery struct {
 }
 
 type RejectSessionRequest struct {
+	Reason string `json:"reason" validate:"required,min=3,max=255"`
+}
+
+type RegisterSessionQuery struct {
+	SessionID uuid.UUID `param:"session_id" validate:"required,uuid"`
+}
+
+type RegisterSessionRequest struct {
+	UserID uuid.UUID // from context
+}
+
+type UnregisterSessionQuery struct {
+	SessionID uuid.UUID `param:"session_id" validate:"required,uuid"`
+}
+
+type UnregisterSessionRequest struct {
+	UserID uuid.UUID // from context
+	Reason string `json:"reason" validate:"required,min=3,max=255"`
+}
+
+type ReviewSessionQuery struct {
+	SessionID uuid.UUID `param:"session_id" validate:"required,uuid"`
+}
+
+type ReviewSessionRequest struct {
+	UserID uuid.UUID // from context
+	Review string `json:"review" validate:"required,min=3,max=255"`
+}
+
+type DeleteReviewSessionQuery struct {
+	SessionID uuid.UUID `param:"session_id" validate:"required,uuid"`
+	UserID    uuid.UUID `param:"user_id" validate:"required,uuid"`
+}
+
+type DeleteReviewSessionRequest struct {
 	Reason string `json:"reason" validate:"required,min=3,max=255"`
 }

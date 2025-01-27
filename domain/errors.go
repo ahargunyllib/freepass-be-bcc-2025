@@ -82,3 +82,53 @@ var ErrSessionProposalLimit = &RequestError{
 	StatusCode: http.StatusBadRequest,
 	Err:        errors.New("session proposal limit reached"),
 }
+
+var ErrSessionAlreadyStarted = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session already started"),
+}
+
+var ErrSessionAlreadyEnded = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session already ended"),
+}
+
+var ErrSessionNotAccepted = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session not accepted"),
+}
+
+var ErrSessionFull = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session is full"),
+}
+
+var ErrSessionAlreadyRegistered = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session already registered"),
+}
+
+var ErrSessionNotRegistered = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session not registered"),
+}
+
+var ErrSessionTimeConflict = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session time conflict"),
+}
+
+var ErrSessionCancelled = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("you already cancel this session"),
+}
+
+var ErrReviewDeleted = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("review already deleted"),
+}
+
+var ErrSessionAlreadyReviewed = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session already reviewed"),
+}
