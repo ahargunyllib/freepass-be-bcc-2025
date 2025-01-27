@@ -4,6 +4,9 @@ import (
 	authController "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/auth/controller"
 	authRepo "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/auth/repository"
 	authSvc "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/auth/service"
+	sessionController "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/session/controller"
+	sessionRepo "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/session/repository"
+	sessionSvc "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/session/service"
 	userController "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/user/controller"
 	userRepo "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/user/repository"
 	userSvc "github.com/ahargunyllib/freepass-be-bcc-2025/internal/app/user/service"
@@ -80,8 +83,6 @@ func (s *httpServer) MountRoutes(db *sqlx.DB) {
 	validator := validator.Validator
 	jwt := jwt.Jwt
 
-	middleware := middlewares.NewMiddleware(jwt)
-
 	s.app.Get("/", func(c *fiber.Ctx) error {
 		return response.SendResponse(c, fiber.StatusOK, "Freepass BE BCC 2025")
 	})
@@ -95,12 +96,17 @@ func (s *httpServer) MountRoutes(db *sqlx.DB) {
 
 	userRepository := userRepo.NewUserRepository(db)
 	authRepository := authRepo.NewAuthRepository(db)
+	sessionRepository := sessionRepo.NewSessionRepository(db)
+
+	middleware := middlewares.NewMiddleware(jwt, sessionRepository)
 
 	userService := userSvc.NewUserService(userRepository, validator, uuid, bcrypt)
 	authService := authSvc.NewAuthService(authRepository, validator, uuid, bcrypt, jwt)
+	sessionService := sessionSvc.NewSessionService(sessionRepository, validator, uuid)
 
 	userController.InitUserController(v1, userService, middleware)
 	authController.InitAuthController(v1, authService, middleware)
+	sessionController.InitSessionController(v1, sessionService, middleware)
 
 	s.app.Use(func(c *fiber.Ctx) error {
 		return c.SendFile("./web/not-found.html")

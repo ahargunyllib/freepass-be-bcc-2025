@@ -62,3 +62,23 @@ var ErrCantAccessResource = &RequestError{
 	StatusCode: http.StatusForbidden,
 	Err:        errors.New("you don't have access to this resource"),
 }
+
+var ErrSessionNotFound = &RequestError{
+	StatusCode: http.StatusNotFound,
+	Err:        errors.New("session not found"),
+}
+
+var ErrSessionCannotBeUpdated = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session cannot be updated"),
+}
+
+var ErrSessionCannotBeDeleted = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session cannot be deleted"),
+}
+
+var ErrSessionProposalLimit = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session proposal limit reached"),
+}
