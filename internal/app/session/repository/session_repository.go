@@ -65,40 +65,49 @@ func (s *sessionRepository) FindAll(
 		FROM sessions JOIN users proposer ON proposer.id=sessions.proposer_id
 		WHERE 1=1
 	`
+	args := []interface{}{}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (title ILIKE %s)", "'%"+search+"%'")
+		query += fmt.Sprintf(" AND (title ILIKE $%d)", len(args)+1)
+		args = append(args, "%"+search+"%")
 	}
 
 	if sessionType != 0 {
-		query += fmt.Sprintf(" AND type = %d", sessionType)
+		query += fmt.Sprintf(" AND type = $%d", len(args)+1)
+		args = append(args, sessionType)
 	}
 
 	if tags != 0 {
-		query += fmt.Sprintf(" AND (tags & %d) = %d", tags, tags)
+		query += fmt.Sprintf(" AND (tags & $%d) = $%d", len(args)+1, len(args)+1)
+		args = append(args, tags, tags)
 	}
 
 	if !beforeAt.IsZero() {
-		query += fmt.Sprintf(" AND start_at < %s", beforeAt)
+		query += fmt.Sprintf(" AND start_at < $%d", len(args)+1)
+		args = append(args, beforeAt)
 	}
 
 	if !afterAt.IsZero() {
-		query += fmt.Sprintf(" AND end_at > %s", afterAt)
+		query += fmt.Sprintf(" AND end_at > $%d", len(args)+1)
+		args = append(args, afterAt)
 	}
 
 	if proposerID != uuid.Nil {
-		query += fmt.Sprintf(" AND proposer_id = '%s'", proposerID.String())
+		query += fmt.Sprintf(" AND proposer_id = $%d", len(args)+1)
+		args = append(args, proposerID)
 	}
 
 	if status != 0 {
-		query += fmt.Sprintf(" AND status = %d", status)
+		query += fmt.Sprintf(" AND status = $%d", len(args)+1)
+		args = append(args, status)
 	}
 
 	log.Info(log.LogInfo{
 		"query": query,
 	}, "[SessionRepository] FindAll")
 
-	query += fmt.Sprintf(" AND deleted_at IS NULL ORDER BY %s %s LIMIT %d OFFSET %d", sortBy, sortOrder, limit, offset)
+	query += fmt.Sprintf(" ORDER BY $%d $d%d LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2, len(args)+3, len(args)+4)
+	args = append(args, sortBy, sortOrder, limit, offset)
 
 	err := s.db.SelectContext(ctx, &sessions, query)
 	if err != nil {
@@ -242,27 +251,32 @@ func (s *sessionRepository) CountAttendees(
 		sessions.start_at as start_at, sessions.end_at as end_at
 		FROM session_attendees JOIN sessions ON sessions.id=session_attendees.session_id
 		WHERE 1=1`
+		args := []interface{}{}
 
 	if sessionID != uuid.Nil {
-		query += fmt.Sprintf(" AND session_id = %s", sessionID)
+		query += fmt.Sprintf(" AND session_id = %d", len(args)+1)
+		args = append(args, sessionID)
 	}
 
 	if userID != uuid.Nil {
-		query += fmt.Sprintf(" AND user_id = %s", userID)
+		query += fmt.Sprintf(" AND user_id = %d", len(args)+1)
+		args = append(args, userID)
 	}
 
 	if !beforeAt.IsZero() {
-		query += fmt.Sprintf(" AND end_at <= %s", beforeAt)
+		query += fmt.Sprintf(" AND end_at <= %d", len(args)+1)
+		args = append(args, beforeAt)
 	}
 
 	if !afterAt.IsZero() {
-		query += fmt.Sprintf(" AND start_at >= %s", afterAt)
+		query += fmt.Sprintf(" AND start_at >= %d", len(args)+1)
+		args = append(args, afterAt)
 	}
 
 	if canceled {
 		query += " AND reason IS NOT NULL"
 	}
-	err := s.db.GetContext(ctx, &count, query, userID)
+	err := s.db.GetContext(ctx, &count, query, args...)
 	if err != nil {
 		return 0, err
 	}
@@ -331,7 +345,7 @@ func (s *sessionRepository) FindSessionAttendees(
 		query += fmt.Sprintf(" AND user_id = $%d", len(args)+1)
 		args = append(args, userID)
 	}
-	
+
 	sessionAttendees := []entity.SessionAttendee{}
 	err := s.db.SelectContext(
 		ctx,
