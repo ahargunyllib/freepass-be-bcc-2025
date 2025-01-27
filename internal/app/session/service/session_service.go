@@ -787,6 +787,19 @@ func (s *sessionService) CancelSession(
 		return err
 	}
 
+	if session.Status != 2 {
+		return domain.ErrSessionNotAccepted
+	}
+
+	now := time.Now()
+	if session.StartAt.Before(now) {
+		return domain.ErrSessionAlreadyStarted
+	}
+
+	if session.EndAt.Before(now) {
+		return domain.ErrSessionAlreadyEnded
+	}
+
 	session.DeletedAt = sql.NullTime{Time: time.Now(), Valid: true}
 
 	err = s.repo.Update(ctx, session)
