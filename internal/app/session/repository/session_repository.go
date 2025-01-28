@@ -27,7 +27,12 @@ func (s *sessionRepository) Create(ctx context.Context, session *entity.Session)
 		`,
 		session,
 	)
+
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][Create]")
+
 		return err
 	}
 
@@ -37,6 +42,10 @@ func (s *sessionRepository) Create(ctx context.Context, session *entity.Session)
 func (s *sessionRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	_, err := s.db.ExecContext(ctx, "DELETE FROM sessions WHERE id = $1", id)
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][Delete]")
+
 		return err
 	}
 
@@ -111,6 +120,10 @@ func (s *sessionRepository) FindAll(
 
 	err := s.db.SelectContext(ctx, &sessions, query, args...)
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][FindAll]")
+
 		return nil, err
 	}
 
@@ -170,6 +183,10 @@ func (s *sessionRepository) Count(
 
 	err := s.db.GetContext(ctx, &count, query, args...)
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][Count]")
+
 		return 0, err
 	}
 
@@ -187,6 +204,10 @@ func (s *sessionRepository) FindByID(ctx context.Context, id uuid.UUID) (*entity
 	var session entity.Session
 	err := s.db.GetContext(ctx, &session, query, id)
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][FindByID]")
+
 		return nil, err
 	}
 
@@ -206,6 +227,10 @@ func (s *sessionRepository) Update(ctx context.Context, session *entity.Session)
 		session,
 	)
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][Update]")
+
 		return err
 	}
 
@@ -223,6 +248,10 @@ func (s *sessionRepository) CreateSessionAttendee(ctx context.Context, sessionAt
 		sessionAttendee,
 	)
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][CreateSessionAttendee]")
+
 		return err
 	}
 
@@ -240,6 +269,10 @@ func (s *sessionRepository) UpdateSessionAttendee(ctx context.Context, sessionAt
 		sessionAttendee,
 	)
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][UpdateSessionAttendee]")
+
 		return err
 	}
 
@@ -259,7 +292,7 @@ func (s *sessionRepository) CountAttendees(
 		sessions.start_at as start_at, sessions.end_at as end_at
 		FROM session_attendees JOIN sessions ON sessions.id=session_attendees.session_id
 		WHERE 1=1`
-		args := []interface{}{}
+	args := []interface{}{}
 
 	if sessionID != uuid.Nil {
 		query += fmt.Sprintf(" AND session_id = %d", len(args)+1)
@@ -286,6 +319,10 @@ func (s *sessionRepository) CountAttendees(
 	}
 	err := s.db.GetContext(ctx, &count, query, args...)
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][CountAttendees]")
+
 		return 0, err
 	}
 
@@ -302,6 +339,9 @@ func (s *sessionRepository) FindSessionAttendee(ctx context.Context, sessionID, 
 		userID,
 	)
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][FindSessionAttendee]")
 		return nil, err
 	}
 
@@ -362,6 +402,10 @@ func (s *sessionRepository) FindSessionAttendees(
 		args...,
 	)
 	if err != nil {
+		log.Error(log.LogInfo{
+			"error": err,
+		}, "[SessionRepository][FindSessionAttendees]")
+
 		return nil, err
 	}
 
