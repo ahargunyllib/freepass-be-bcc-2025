@@ -170,7 +170,10 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
 
 ### Run in local environment
-1. Ensure you have [Go](https://go.dev/dl/) 1.23 or higher and [Task](https://taskfile.dev/installation/) installed on your machine:
+
+> **Note:** This project uses [Task](https://taskfile.dev/) as a task runner. You can also run the commands manually if you don't want to use Task. Just copy the command from the `Taskfile.yml` file.
+
+1. Ensure you have [Go](https://go.dev/dl/) 1.23 or higher installed on your machine:
 
    ```bash
    go version && task --version # windows
@@ -185,7 +188,7 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 
    Update configuration values as needed.
 
-3. Install all dependencies, run docker compose, create database schema, and run database migrations:
+3. Install all dependencies:
 
    ```bash
    task
