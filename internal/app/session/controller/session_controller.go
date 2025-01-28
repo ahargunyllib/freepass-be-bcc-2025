@@ -19,19 +19,18 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 	controller := sessionController{service: service}
 
 	sessionRouter := router.Group("/sessions")
+	
 	sessionRouter.Get("/", middleware.RequireAuth(),
-		middleware.RequirePermission([]int16{1, 2}), // user, event coordinator
 		controller.GetSessions)
 	sessionRouter.Get("/:id",
 		middleware.RequireAuth(),
-		middleware.RequirePermission([]int16{1, 2}), // user, event coordinator
 		controller.GetSession,
 	)
 	sessionRouter.Get("/:id/attendees",
 		middleware.RequireAuth(),
-		middleware.RequirePermission([]int16{1, 2}), // user, event coordinator
 		controller.GetSessionAttendees,
 	)
+
 	sessionRouter.Post(
 		"/",
 		middleware.RequireAuth(),
