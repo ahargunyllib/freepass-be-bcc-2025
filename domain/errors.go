@@ -147,3 +147,8 @@ var ErrClaimsNotFound = &RequestError{
 	StatusCode: http.StatusInternalServerError,
 	Err:        errors.New("claims not found"),
 }
+
+var ErrCantUpdateTitle = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("you can't update the title"),
+}

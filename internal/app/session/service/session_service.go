@@ -530,8 +530,8 @@ func (s *sessionService) UpdateSession(ctx context.Context, req dto.UpdateSessio
 		return err
 	}
 
-	if session.Status != 1 {
-		return domain.ErrSessionCannotBeUpdated
+	if session.Status != 1 && req.Title != "" {
+		return domain.ErrCantUpdateTitle
 	}
 
 	tagsBinary := "000000"
