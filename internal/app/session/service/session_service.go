@@ -215,6 +215,86 @@ func (s *sessionService) DeleteSession(ctx context.Context, query dto.DeleteSess
 	return nil
 }
 
+func (s *sessionService) GetSessionAttendees(
+	ctx context.Context,
+	query dto.GetSessionAttendeesQuery,
+) (dto.GetSessionAttendeesResponse, error) {
+	valErr := s.validator.Validate(query)
+	if valErr != nil {
+		return dto.GetSessionAttendeesResponse{}, valErr
+	}
+
+	if query.Limit < 1 {
+		query.Limit = 10
+	}
+
+	if query.Page < 1 {
+		query.Page = 1
+	}
+
+	if query.SortBy == "" {
+		query.SortBy = "user_id"
+	}
+
+	if query.SortOrder == "" {
+		query.SortOrder = "ASC"
+	}
+
+	sessionAttendees, err := s.repo.FindSessionAttendees(
+		ctx,
+		query.ID,
+		uuid.Nil,
+		query.Limit,
+		query.Limit*(query.Page-1),
+		query.SortBy,
+		query.SortOrder,
+	)
+	if err != nil {
+		return dto.GetSessionAttendeesResponse{}, err
+	}
+
+	countSessionAttendees, err := s.repo.CountAttendees(
+		ctx,
+		query.ID,
+		uuid.Nil,
+		time.Time{},
+		time.Time{},
+		false,
+	)
+	if err != nil {
+		return dto.GetSessionAttendeesResponse{}, err
+	}
+
+	meta := dto.PaginationResponse{
+		TotalData: countSessionAttendees,
+		TotalPage: int(countSessionAttendees) / query.Limit,
+		Page:      query.Page,
+		Limit:     query.Limit,
+	}
+
+	sessionAttendeesResponse := []dto.SessionAttendeeResponse{}
+	for _, sessionAttendee := range sessionAttendees {
+		sessionAttendeesResponse = append(sessionAttendeesResponse, dto.SessionAttendeeResponse{
+			SessionID: sessionAttendee.SessionID,
+			UserID:    sessionAttendee.UserID,
+			Reason:    sessionAttendee.Reason.String,
+			Review:    sessionAttendee.Review.String,
+			User: dto.UserResponse{
+				ID:    sessionAttendee.User.ID,
+				Name:  sessionAttendee.User.Name,
+				Email: sessionAttendee.User.Email,
+			},
+		})
+	}
+
+	res := dto.GetSessionAttendeesResponse{
+		SessionAttendees: sessionAttendeesResponse,
+		Meta:             meta,
+	}
+
+	return res, nil
+}
+
 func (s *sessionService) GetSession(
 	ctx context.Context,
 	query dto.GetSessionEventQuery,
@@ -244,7 +324,6 @@ func (s *sessionService) GetSession(
 	if err != nil {
 		return dto.GetSessionEventResponse{}, err
 	}
-
 
 	sessionResponse := dto.SessionResponse{
 		ID:          session.ID,
@@ -593,7 +672,7 @@ func (s *sessionService) RegisterSession(
 		req.UserID,
 		session.EndAt,
 		session.StartAt,
-		true,
+		false,
 	)
 	if err != nil {
 		return err

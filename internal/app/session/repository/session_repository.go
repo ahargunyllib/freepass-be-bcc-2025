@@ -352,6 +352,10 @@ func (s *sessionRepository) FindSessionAttendees(
 	ctx context.Context,
 	sessionID uuid.UUID,
 	userID uuid.UUID,
+	limit int,
+	offset int,
+	sortBy string,
+	sortOrder string,
 ) ([]entity.SessionAttendee, error) {
 	query := `SELECT session_attendees.*, sessions.proposer_id as "session.proposer_id", sessions.title as "session.title",
 			sessions.description as "session.description", sessions.type as "session.type",
@@ -378,6 +382,9 @@ func (s *sessionRepository) FindSessionAttendees(
 		query += fmt.Sprintf(" AND session_attendees.user_id = $%d", len(args)+1)
 		args = append(args, userID)
 	}
+
+	query += fmt.Sprintf(" ORDER BY %s %s LIMIT $%d OFFSET $%d", sortBy, sortOrder, len(args)+1, len(args)+2)
+	args = append(args, limit, offset)
 
 	sessionAttendees := []entity.SessionAttendee{}
 	err := s.db.SelectContext(

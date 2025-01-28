@@ -27,6 +27,11 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 		middleware.RequirePermission([]int16{1, 2}), // user, event coordinator
 		controller.GetSession,
 	)
+	sessionRouter.Get("/:id/attendees",
+		middleware.RequireAuth(),
+		middleware.RequirePermission([]int16{1, 2}), // user, event coordinator
+		controller.GetSessionAttendees,
+	)
 	sessionRouter.Post(
 		"/",
 		middleware.RequireAuth(),
@@ -155,6 +160,24 @@ func (c *sessionController) GetSession(ctx *fiber.Ctx) error {
 	}
 
 	return response.SendResponse(ctx, fiber.StatusOK, session)
+}
+
+func (c *sessionController) GetSessionAttendees(ctx *fiber.Ctx) error {
+	var query dto.GetSessionAttendeesQuery
+	if err := ctx.ParamsParser(&query); err != nil {
+		return err
+	}
+
+	if err := ctx.QueryParser(&query); err != nil {
+		return err
+	}
+
+	attendees, err := c.service.GetSessionAttendees(ctx.Context(), query)
+	if err != nil {
+		return err
+	}
+
+	return response.SendResponse(ctx, fiber.StatusOK, attendees)
 }
 
 func (c *sessionController) CreateSession(ctx *fiber.Ctx) error {

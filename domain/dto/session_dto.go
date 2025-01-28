@@ -7,23 +7,23 @@ import (
 )
 
 type SessionResponse struct {
-	ID              uuid.UUID                `json:"id"`
-	Title           string                   `json:"title"`
-	Description     string                   `json:"description,omitempty"`
-	Type            int16                    `json:"type"`
-	Tags            []string                 `json:"tags"`
-	StartAt         time.Time                `json:"start_at"`
-	EndAt           time.Time                `json:"end_at"`
-	Room            string                   `json:"room,omitempty"`
-	Status          int16                    `json:"status"`
-	MeetingURL      string                   `json:"meeting_url,omitempty"`
-	Capacity        int                      `json:"capacity"`
-	ImageURI        string                   `json:"image_uri,omitempty"`
-	Proposer        UserResponse             `json:"proposer"`
-	CountAttendees  int64                      `json:"count_attendees"`
+	ID             uuid.UUID    `json:"id"`
+	Title          string       `json:"title"`
+	Description    string       `json:"description,omitempty"`
+	Type           int16        `json:"type"`
+	Tags           []string     `json:"tags"`
+	StartAt        time.Time    `json:"start_at"`
+	EndAt          time.Time    `json:"end_at"`
+	Room           string       `json:"room,omitempty"`
+	Status         int16        `json:"status"`
+	MeetingURL     string       `json:"meeting_url,omitempty"`
+	Capacity       int          `json:"capacity"`
+	ImageURI       string       `json:"image_uri,omitempty"`
+	Proposer       UserResponse `json:"proposer"`
+	CountAttendees int64        `json:"count_attendees"`
 }
 
-type SessionAtendeeResponse struct {
+type SessionAttendeeResponse struct {
 	SessionID uuid.UUID       `json:"session_id"`
 	UserID    uuid.UUID       `json:"user_id"`
 	Review    string          `json:"review,omitempty"`
@@ -57,6 +57,20 @@ type GetSessionEventQuery struct {
 
 type GetSessionEventResponse struct {
 	Session SessionResponse `json:"session"`
+}
+
+type GetSessionAttendeesQuery struct {
+	ID        uuid.UUID `param:"id" validate:"required,uuid"`
+	Search    string    `query:"search" validate:"omitempty,max=255"`
+	Limit     int       `query:"limit" validate:"omitempty,numeric,min=1,max=100"`
+	Page      int       `query:"page" validate:"omitempty,numeric,min=1"`
+	SortBy    string    `query:"sort_by" validate:"omitempty,oneof=id title start_at end_at capacity"`
+	SortOrder string    `query:"sort_order" validate:"omitempty,oneof=asc desc"`
+}
+
+type GetSessionAttendeesResponse struct {
+	SessionAttendees []SessionAttendeeResponse `json:"session_attendees"`
+	Meta             PaginationResponse        `json:"meta"`
 }
 
 type CreateSessionRequest struct {

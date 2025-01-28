@@ -49,6 +49,8 @@ type SessionRepository interface {
 		ctx context.Context,
 		sessionID uuid.UUID,
 		userID uuid.UUID,
+		limit, offset int,
+		sortBy, sortOrder string,
 	) ([]entity.SessionAttendee, error)
 	CreateSessionAttendee(ctx context.Context, sessionAttendee *entity.SessionAttendee) error
 	UpdateSessionAttendee(ctx context.Context, sessionAttendee *entity.SessionAttendee) error
@@ -57,6 +59,7 @@ type SessionRepository interface {
 type SessionService interface {
 	GetSessions(ctx context.Context, query dto.GetSessionsQuery) (dto.GetSessionsResponse, error)
 	GetSession(ctx context.Context, query dto.GetSessionEventQuery) (dto.GetSessionEventResponse, error)
+	GetSessionAttendees(ctx context.Context, query dto.GetSessionAttendeesQuery) (dto.GetSessionAttendeesResponse, error)
 	CreateSession(ctx context.Context, req dto.CreateSessionRequest) error
 	UpdateSession(ctx context.Context, req dto.UpdateSessionRequest) error
 	DeleteSession(ctx context.Context, query dto.DeleteSessionQuery) error
