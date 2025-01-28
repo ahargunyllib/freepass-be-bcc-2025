@@ -20,7 +20,7 @@ type SessionResponse struct {
 	Capacity        int                      `json:"capacity"`
 	ImageURI        *string                  `json:"image_uri"`
 	Proposer        UserResponse             `json:"proposer"`
-	SessionAtendees []SessionAtendeeResponse `json:"session_atendees"`
+	SessionAtendees []SessionAtendeeResponse `json:"session_attendees"`
 }
 
 type SessionAtendeeResponse struct {
