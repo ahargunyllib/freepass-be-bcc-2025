@@ -851,7 +851,7 @@ func (s *sessionService) DeleteReviewSession(
 
 	sessionAttendee.DeletedReason = sql.NullString{String: req.Reason, Valid: true}
 
-	err = s.repo.Update(ctx, session)
+	err = s.repo.UpdateSessionAttendee(ctx, sessionAttendee)
 	if err != nil {
 		return err
 	}
