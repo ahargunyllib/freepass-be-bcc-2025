@@ -63,27 +63,26 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 		controller.CancelSession,
 	)
 
-
 	sessionRouter.Post(
-		"/:session_id/register",
+		"/:sessionID/register",
 		middleware.RequireAuth(),
 		middleware.RequirePermission([]int16{1}), // user
 		controller.RegisterSession,
 	)
 	sessionRouter.Post(
-		"/:sesion_id/unregister",
+		"/:sessionID/unregister",
 		middleware.RequireAuth(),
 		middleware.RequirePermission([]int16{1}), // user
 		controller.UnregisterSession,
 	)
 	sessionRouter.Post(
-		"/:sesion_id/review",
+		"/:sessionID/review",
 		middleware.RequireAuth(),
 		middleware.RequirePermission([]int16{1}), // user
 		controller.ReviewSession,
 	)
 	sessionRouter.Post(
-		"/:sesion_id/review/:user_id/remove",
+		"/:sessionID/review/:userID/remove",
 		middleware.RequireAuth(),
 		middleware.RequirePermission([]int16{2}), // admin
 		controller.RemoveReview,

@@ -114,7 +114,7 @@ type RejectSessionRequest struct {
 }
 
 type RegisterSessionQuery struct {
-	SessionID uuid.UUID `param:"session_id" validate:"required,uuid"`
+	SessionID uuid.UUID `param:"sessionID" validate:"required,uuid"`
 }
 
 type RegisterSessionRequest struct {
@@ -122,7 +122,7 @@ type RegisterSessionRequest struct {
 }
 
 type UnregisterSessionQuery struct {
-	SessionID uuid.UUID `param:"session_id" validate:"required,uuid"`
+	SessionID uuid.UUID `param:"sessionID" validate:"required,uuid"`
 }
 
 type UnregisterSessionRequest struct {
@@ -131,7 +131,7 @@ type UnregisterSessionRequest struct {
 }
 
 type ReviewSessionQuery struct {
-	SessionID uuid.UUID `param:"session_id" validate:"required,uuid"`
+	SessionID uuid.UUID `param:"sessionID" validate:"required,uuid"`
 }
 
 type ReviewSessionRequest struct {
@@ -140,8 +140,8 @@ type ReviewSessionRequest struct {
 }
 
 type DeleteReviewSessionQuery struct {
-	SessionID uuid.UUID `param:"session_id" validate:"required,uuid"`
-	UserID    uuid.UUID `param:"user_id" validate:"required,uuid"`
+	SessionID uuid.UUID `param:"sessionID" validate:"required,uuid"`
+	UserID    uuid.UUID `param:"userID" validate:"required,uuid"`
 }
 
 type DeleteReviewSessionRequest struct {
