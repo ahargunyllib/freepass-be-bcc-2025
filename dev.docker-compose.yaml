@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - PORT=8080
+    env_file: "./config/.env"
     depends_on:
       db:
         condition: service_healthy
@@ -15,6 +16,8 @@ services:
       replicas: 2
     volumes:
       - ./data/logs:/app/data/logs
+      - ./data/seeders:/app/data/seeders
+      - ./config/.env:/app/config/.env
     networks:
       - network
     restart: on-failure

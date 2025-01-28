@@ -64,6 +64,13 @@ tasks:
         - DB_USER
         - DB_NAME
 
+  service:db:migrate:
+    desc: "Run database migrations"
+    cmd: docker run -v ./database/migrations:/migrations --network host migrate/migrate -path=/migrations/ -database {{.DSN}} up
+    requires:
+      vars:
+        - DSN
+
   db:docs:generate:
     desc: "Generate DBML from direct DB connection"
     cmd: dbdocs db2dbml postgres {{.DSN}} -o {{.DBML_FILE}}

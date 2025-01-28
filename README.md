@@ -220,6 +220,45 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
    task dev
    ```
 
+### Run in Docker environment
+1. Ensure you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine:
+
+   ```bash
+   docker --version && docker-compose --version
+   ```
+
+2. Create a copy of the `.env.example` file and rename it to `.env`:
+
+   ```bash
+    cp ./config/.env.example ./config/.env
+    ```
+
+    Update configuration values as needed. Ensure the `DB_HOST` is set to `db`.
+
+3. Build and run the project:
+
+   ```bash
+   go-task service:run -- dev
+   ```
+
+4. Run migrations:
+
+   ```bash
+   go-task service:db:migrate
+   ```
+
+   Ensure the `DB_HOST` is set to `localhost`.
+
+5. Seed the database:
+
+   ```bash
+    go-task db:seed
+    ```
+
+    Ensure the `DB_HOST` is set to `localhost`.
+
+> **Note:** If you encounter host resolution issues, try to update the `DB_HOST` value to `localhost` or `db` in the `.env` file.
+
 ## **📞** Contact
 
 Have any questions? You can contact either [Tyo](https://www.instagram.com/nandanatyo/) or [Ilham](https://www.instagram.com/iilham_akbar/).
