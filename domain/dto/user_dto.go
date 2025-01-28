@@ -39,8 +39,9 @@ type CreateUserRequest struct {
 }
 
 type UpdateUserRequest struct {
-	ID   uuid.UUID // from context
-	Name string    `json:"name" validate:"omitempty,min=3,max=255"`
+	ID       uuid.UUID // from context
+	Name     string    `json:"name" validate:"omitempty,min=3,max=255"`
+	Password string    `json:"password" validate:"omitempty,min=8,max=255"`
 }
 
 type DeleteUserQuery struct {

@@ -77,7 +77,18 @@ func (u *userService) UpdateUser(ctx context.Context, req dto.UpdateUserRequest)
 		return err
 	}
 
-	user.Name = req.Name
+	if req.Name != "" {
+		user.Name = req.Name
+	}
+
+	if req.Password != "" {
+		hashedPassword, hashErr := u.bcrypt.Hash(req.Password)
+		if hashErr != nil {
+			return hashErr
+		}
+
+		user.Password = hashedPassword
+	}
 
 	err = u.repo.Update(ctx, user)
 	if err != nil {
