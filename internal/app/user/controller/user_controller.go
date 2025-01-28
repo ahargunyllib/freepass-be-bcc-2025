@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"github.com/ahargunyllib/freepass-be-bcc-2025/domain"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/contracts"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/dto"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/internal/middlewares"
 	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/helpers/http/response"
+	"github.com/ahargunyllib/freepass-be-bcc-2025/pkg/jwt"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -20,8 +22,9 @@ func InitUserController(router fiber.Router, userService contracts.UserService, 
 	userRouter := router.Group("/users")
 
 	userRouter.Get("/", middleware.RequireAuth(), middleware.RequirePermission([]int16{3}), controller.GetUsers)
-	userRouter.Get("/:id", middleware.RequireAuth(), middleware.RequirePermission([]int16{1,3}), controller.GetUser)
+	userRouter.Get("/:id", middleware.RequireAuth(), middleware.RequirePermission([]int16{1, 3}), controller.GetUser)
 	userRouter.Post("/", middleware.RequireAuth(), middleware.RequirePermission([]int16{3}), controller.CreateUser)
+	userRouter.Patch("/", middleware.RequireAuth(), middleware.RequirePermission([]int16{1}), controller.UpdateUser)
 	userRouter.Delete("/:id", middleware.RequireAuth(), middleware.RequirePermission([]int16{3}), controller.DeleteUser)
 }
 
@@ -65,6 +68,27 @@ func (u *userController) CreateUser(c *fiber.Ctx) error {
 	}
 
 	return response.SendResponse(c, fiber.StatusCreated, nil)
+}
+
+func (u *userController) UpdateUser(c *fiber.Ctx) error {
+	var req dto.UpdateUserRequest
+	if err := c.BodyParser(&req); err != nil {
+		return err
+	}
+
+	claims, ok := c.Locals("claims").(jwt.Claims)
+	if !ok {
+		return domain.ErrClaimsNotFound
+	}
+
+	req.ID = claims.UserID
+
+	err := u.userService.UpdateUser(c.Context(), req)
+	if err != nil {
+		return err
+	}
+
+	return response.SendResponse(c, fiber.StatusOK, nil)
 }
 
 func (u *userController) DeleteUser(c *fiber.Ctx) error {

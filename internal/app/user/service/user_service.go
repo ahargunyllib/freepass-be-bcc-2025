@@ -62,6 +62,31 @@ func (u *userService) CreateUser(ctx context.Context, req dto.CreateUserRequest)
 	return nil
 }
 
+func (u *userService) UpdateUser(ctx context.Context, req dto.UpdateUserRequest) error {
+	valErr := u.validator.Validate(req)
+	if valErr != nil {
+		return valErr
+	}
+
+	user, err := u.repo.FindByID(ctx, req.ID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ErrUserNotFound
+		}
+
+		return err
+	}
+
+	user.Name = req.Name
+
+	err = u.repo.Update(ctx, user)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (u *userService) DeleteUser(ctx context.Context, query dto.DeleteUserQuery) error {
 	valErr := u.validator.Validate(query)
 	if valErr != nil {

@@ -38,6 +38,11 @@ type CreateUserRequest struct {
 	Password string `json:"password" validate:"required,min=8,max=255"`
 }
 
+type UpdateUserRequest struct {
+	ID   uuid.UUID // from context
+	Name string    `json:"name" validate:"omitempty,min=3,max=255"`
+}
+
 type DeleteUserQuery struct {
 	ID uuid.UUID `param:"id" validate:"required,uuid"`
 }

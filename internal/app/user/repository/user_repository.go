@@ -14,11 +14,25 @@ type userRepository struct {
 	db *sqlx.DB
 }
 
-func (u *userRepository) Create(ctx context.Context, user entity.User) error {
+func (u *userRepository) Create(ctx context.Context, user *entity.User) error {
 	_, err := u.db.NamedExecContext(ctx, `
 		INSERT INTO users
 		(id, name, email, password, role)
 		VALUES (:id, :name, :email, :password, :role)
+		`, user,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *userRepository) Update(ctx context.Context, user *entity.User) error {
+	_, err := u.db.NamedExecContext(ctx, `
+		UPDATE users
+		SET name = :name, email = :email, password = :password, role = :role
+		WHERE id = :id
 		`, user,
 	)
 	if err != nil {
