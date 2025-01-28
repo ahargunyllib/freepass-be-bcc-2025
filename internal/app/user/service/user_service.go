@@ -46,7 +46,7 @@ func (u *userService) CreateUser(ctx context.Context, req dto.CreateUserRequest)
 		return err
 	}
 
-	user := entity.User{
+	user := &entity.User{
 		ID:       id,
 		Name:     req.Name,
 		Email:    req.Email,
