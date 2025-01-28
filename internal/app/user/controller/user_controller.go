@@ -24,7 +24,7 @@ func InitUserController(router fiber.Router, userService contracts.UserService, 
 	userRouter.Get("/", middleware.RequireAuth(), middleware.RequirePermission([]int16{3}), controller.GetUsers)
 	userRouter.Get("/:id", middleware.RequireAuth(), controller.GetUser)
 	userRouter.Post("/", middleware.RequireAuth(), middleware.RequirePermission([]int16{3}), controller.CreateUser)
-	userRouter.Patch("/", middleware.RequireAuth(), middleware.RequirePermission([]int16{1}), controller.UpdateUser)
+	userRouter.Patch("/", middleware.RequireAuth(), controller.UpdateUser)
 	userRouter.Delete("/:id", middleware.RequireAuth(), middleware.RequirePermission([]int16{3}), controller.DeleteUser)
 }
 
