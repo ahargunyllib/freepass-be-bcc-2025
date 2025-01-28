@@ -6,7 +6,8 @@ CREATE TABLE session_attendees (
   deleted_reason VARCHAR(255) NULL,
   CHECK (
     (review IS NOT NULL AND reason IS NULL) OR
-    (review IS NULL AND reason IS NOT NULL)
+    (review IS NULL AND reason IS NOT NULL) OR
+    (review IS NULL AND reason IS NULL)
   ),
   PRIMARY KEY (session_id, user_id)
 );

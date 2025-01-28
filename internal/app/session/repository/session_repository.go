@@ -288,8 +288,7 @@ func (s *sessionRepository) CountAttendees(
 	canceled bool,
 ) (int64, error) {
 	var count int64
-	query := `SELECT COUNT(session_attendees.*),
-		sessions.start_at as start_at, sessions.end_at as end_at
+	query := `SELECT COUNT(session_attendees.*)
 		FROM session_attendees JOIN sessions ON sessions.id=session_attendees.session_id
 		WHERE 1=1`
 	args := []interface{}{}
@@ -315,10 +314,8 @@ func (s *sessionRepository) CountAttendees(
 	}
 
 	if canceled {
-		query += " AND reason IS NOT NULL AND deleted_reason IS NULL"
+		query += " AND session_attendees.reason IS NOT NULL AND session_attendees.deleted_reason IS NULL"
 	}
-
-	query += " GROUP BY sessions.start_at, sessions.end_at"
 
 	err := s.db.GetContext(ctx, &count, query, args...)
 	if err != nil {
@@ -388,12 +385,12 @@ func (s *sessionRepository) FindSessionAttendees(
 	args := []interface{}{}
 
 	if sessionID != uuid.Nil {
-		query += fmt.Sprintf(" AND session_id = $%d", len(args)+1)
+		query += fmt.Sprintf(" AND session_attendees.session_id = $%d", len(args)+1)
 		args = append(args, sessionID)
 	}
 
 	if userID != uuid.Nil {
-		query += fmt.Sprintf(" AND user_id = $%d", len(args)+1)
+		query += fmt.Sprintf(" AND session_attendees.user_id = $%d", len(args)+1)
 		args = append(args, userID)
 	}
 
