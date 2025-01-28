@@ -27,3 +27,10 @@ CREATE TRIGGER update_sessions_timestamp
 BEFORE UPDATE ON sessions
 FOR EACH ROW
 EXECUTE FUNCTION update_timestamp();
+
+CREATE INDEX sessions_proposer_id_index ON sessions(proposer_id);
+CREATE INDEX sessions_title_index ON sessions(title);
+CREATE INDEX sessions_type_index ON sessions(type);
+CREATE INDEX sessions_status_index ON sessions(status);
+CREATE INDEX sessions_start_at_index ON sessions(start_at);
+CREATE INDEX sessions_end_at_index ON sessions(end_at);
