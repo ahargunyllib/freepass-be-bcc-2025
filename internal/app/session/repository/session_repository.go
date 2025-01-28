@@ -295,28 +295,31 @@ func (s *sessionRepository) CountAttendees(
 	args := []interface{}{}
 
 	if sessionID != uuid.Nil {
-		query += fmt.Sprintf(" AND session_id = %d", len(args)+1)
+		query += fmt.Sprintf(" AND session_id = $%d", len(args)+1)
 		args = append(args, sessionID)
 	}
 
 	if userID != uuid.Nil {
-		query += fmt.Sprintf(" AND user_id = %d", len(args)+1)
+		query += fmt.Sprintf(" AND user_id = $%d", len(args)+1)
 		args = append(args, userID)
 	}
 
 	if !beforeAt.IsZero() {
-		query += fmt.Sprintf(" AND end_at <= %d", len(args)+1)
+		query += fmt.Sprintf(" AND end_at <= $%d", len(args)+1)
 		args = append(args, beforeAt)
 	}
 
 	if !afterAt.IsZero() {
-		query += fmt.Sprintf(" AND start_at >= %d", len(args)+1)
+		query += fmt.Sprintf(" AND start_at >= $%d", len(args)+1)
 		args = append(args, afterAt)
 	}
 
 	if canceled {
 		query += " AND reason IS NOT NULL AND deleted_reason IS NULL"
 	}
+
+	query += " GROUP BY sessions.start_at, sessions.end_at"
+
 	err := s.db.GetContext(ctx, &count, query, args...)
 	if err != nil {
 		log.Error(log.LogInfo{
