@@ -820,7 +820,7 @@ func (s *sessionService) ReviewSession(
 
 	sessionAttendee.Review = sql.NullString{String: req.Review, Valid: true}
 
-	err = s.repo.Update(ctx, session)
+	err = s.repo.UpdateSessionAttendee(ctx, sessionAttendee)
 	if err != nil {
 		return err
 	}
