@@ -142,3 +142,8 @@ var ErrSessionAlreadyReviewed = &RequestError{
 	StatusCode: http.StatusBadRequest,
 	Err:        errors.New("session already reviewed"),
 }
+
+var ErrClaimsNotFound = &RequestError{
+	StatusCode: http.StatusInternalServerError,
+	Err:        errors.New("claims not found"),
+}

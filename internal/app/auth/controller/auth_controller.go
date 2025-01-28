@@ -57,7 +57,7 @@ func (a *authController) Login(c *fiber.Ctx) error {
 func (a *authController) GetSession(c *fiber.Ctx) error {
 	claims, ok := c.Locals("claims").(jwt.Claims)
 	if !ok {
-		return domain.ErrExpiredBearerToken
+		return domain.ErrClaimsNotFound
 	}
 
 	query := dto.GetSessionQuery{

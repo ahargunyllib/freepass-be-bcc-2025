@@ -104,7 +104,7 @@ func (c *sessionController) GetSessions(ctx *fiber.Ctx) error {
 	if query.ProposerID != uuid.Nil {
 		claims, ok := ctx.Locals("claims").(jwt.Claims)
 		if !ok {
-			return response.SendResponse(ctx, fiber.StatusUnauthorized, nil)
+			return domain.ErrClaimsNotFound
 		}
 
 		// only allow user to get their own proposals or admin to get all proposals
@@ -117,7 +117,7 @@ func (c *sessionController) GetSessions(ctx *fiber.Ctx) error {
 	if query.Status != 2 { // not accepted
 		claims, ok := ctx.Locals("claims").(jwt.Claims)
 		if !ok {
-			return response.SendResponse(ctx, fiber.StatusUnauthorized, nil)
+			return domain.ErrClaimsNotFound
 		}
 
 		// user want to get all someone not accepted proposals
@@ -161,7 +161,7 @@ func (c *sessionController) CreateSession(ctx *fiber.Ctx) error {
 
 	claims, ok := ctx.Locals("claims").(jwt.Claims)
 	if !ok {
-		return response.SendResponse(ctx, fiber.StatusUnauthorized, nil)
+		return domain.ErrClaimsNotFound
 	}
 
 	req.ProposerID = claims.UserID
@@ -255,7 +255,7 @@ func (c *sessionController) RegisterSession(ctx *fiber.Ctx) error {
 
 	claims, ok := ctx.Locals("claims").(jwt.Claims)
 	if !ok {
-		return response.SendResponse(ctx, fiber.StatusUnauthorized, nil)
+		return domain.ErrClaimsNotFound
 	}
 
 	req.UserID = claims.UserID
@@ -281,7 +281,7 @@ func (c *sessionController) UnregisterSession(ctx *fiber.Ctx) error {
 
 	claims, ok := ctx.Locals("claims").(jwt.Claims)
 	if !ok {
-		return response.SendResponse(ctx, fiber.StatusUnauthorized, nil)
+		return domain.ErrClaimsNotFound
 	}
 
 	req.UserID = claims.UserID
@@ -307,7 +307,7 @@ func (c *sessionController) ReviewSession(ctx *fiber.Ctx) error {
 
 	claims, ok := ctx.Locals("claims").(jwt.Claims)
 	if !ok {
-		return response.SendResponse(ctx, fiber.StatusUnauthorized, nil)
+		return domain.ErrClaimsNotFound
 	}
 
 	req.UserID = claims.UserID
