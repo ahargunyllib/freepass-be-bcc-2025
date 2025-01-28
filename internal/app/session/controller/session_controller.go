@@ -85,13 +85,13 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 		controller.UnregisterSession,
 	)
 	sessionRouter.Post(
-		"/:sessionID/review",
+		"/:sessionID/reviews",
 		middleware.RequireAuth(),
 		middleware.RequirePermission([]int16{1}), // user
 		controller.ReviewSession,
 	)
 	sessionRouter.Post(
-		"/:sessionID/review/:userID/remove",
+		"/:sessionID/reviews/:userID/remove",
 		middleware.RequireAuth(),
 		middleware.RequirePermission([]int16{2}), // admin
 		controller.RemoveReview,
