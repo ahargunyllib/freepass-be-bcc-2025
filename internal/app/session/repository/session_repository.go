@@ -353,33 +353,18 @@ func (s *sessionRepository) FindSessionAttendees(
 	sessionID uuid.UUID,
 	userID uuid.UUID,
 ) ([]entity.SessionAttendee, error) {
-	query := "SELECT session_attendees.*"
-
-	if sessionID != uuid.Nil {
-		query += `, sessions.proposer_id as "session.proposer_id", sessions.title as "session.title",
+	query := `SELECT session_attendees.*, sessions.proposer_id as "session.proposer_id", sessions.title as "session.title",
 			sessions.description as "session.description", sessions.type as "session.type",
 			sessions.tags as "session.tags", sessions.status as "session.status",
 			sessions.start_at as "session.start_at", sessions.end_at as "session.end_at",
 			sessions.room as "session.room", sessions.meeting_url as "session.meeting_url",
-			sessions.capacity as "session.capacity", sessions.image_uri as "session.image_uri"
-		`
-	}
-
-	if userID != uuid.Nil {
-		query += `, users.id as "user.id", users.name as "user.name",
+			sessions.capacity as "session.capacity", sessions.image_uri as "session.image_uri",
+			users.id as "user.id", users.name as "user.name",
 			users.email as "user.email", users.role as "user.role"
-		`
-	}
-
-	query += ` FROM session_attendees`
-
-	if sessionID != uuid.Nil {
-		query += ` JOIN sessions ON sessions.id=session_attendees.session_id`
-	}
-
-	if userID != uuid.Nil {
-		query += ` JOIN users ON users.id=session_attendees.user_id`
-	}
+			FROM session_attendees
+			JOIN sessions ON sessions.id=session_attendees.session_id
+			JOIN users ON users.id=session_attendees.user_id
+			`
 
 	query += " WHERE 1=1"
 	args := []interface{}{}

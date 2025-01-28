@@ -248,8 +248,8 @@ func (s *sessionService) GetSession(
 				Name:  sessionAttendee.User.Name,
 				Email: sessionAttendee.User.Email,
 			},
-			Reason: &sessionAttendee.Reason.String,
-			Review: &sessionAttendee.Review.String,
+			Reason: sessionAttendee.Reason.String,
+			Review: sessionAttendee.Review.String,
 			UserID: sessionAttendee.User.ID,
 		})
 	}
@@ -272,7 +272,7 @@ func (s *sessionService) GetSession(
 			Name:  session.Proposer.Name,
 			Email: session.Proposer.Email,
 		},
-		SessionAtendees: []dto.SessionAtendeeResponse{},
+		SessionAtendees: sessionAttendeeResponses,
 	}
 
 	res := dto.GetSessionEventResponse{
