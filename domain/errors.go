@@ -19,22 +19,22 @@ func (r *RequestError) Error() string {
 }
 
 var ErrEmailAlreadyExists = &RequestError{
-	StatusCode: 409,
+	StatusCode: http.StatusConflict,
 	Err:        errors.New("email already exists"),
 }
 
 var ErrUserNotFound = &RequestError{
-	StatusCode: 404,
+	StatusCode: http.StatusNotFound,
 	Err:        errors.New("user not found"),
 }
 
 var ErrCannotDeleteAdmin = &RequestError{
-	StatusCode: 403,
+	StatusCode: http.StatusBadRequest,
 	Err:        errors.New("cannot delete admin"),
 }
 
 var ErrInvalidCredentials = &RequestError{
-	StatusCode: 401,
+	StatusCode: http.StatusBadRequest,
 	Err:        errors.New("invalid credentials"),
 }
 
