@@ -169,6 +169,8 @@ The implementation of this project MUST be in the form of a REST, gRPC, or Graph
 
 > Write how to run your service in local or development environment here. If you use Docker to serve your DBMS or your server, you will receive bonus points for your submission.
 
+> See the detail of the project [here](ABOUT.md) here.
+
 ### Run in local environment
 
 > **Note:** This project uses [Task](https://taskfile.dev/) as a task runner. You can also run the commands manually if you don't want to use Task. Just copy the command from the `Taskfile.yml` file.
