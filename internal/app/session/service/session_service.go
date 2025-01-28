@@ -233,46 +233,18 @@ func (s *sessionService) GetSession(
 		return dto.GetSessionEventResponse{}, err
 	}
 
-	sessionAttendees, err := s.repo.FindSessionAttendees(ctx, query.ID, uuid.Nil)
+	countSessionAttendees, err := s.repo.CountAttendees(
+		ctx,
+		query.ID,
+		uuid.Nil,
+		time.Time{},
+		time.Time{},
+		false,
+	)
 	if err != nil {
 		return dto.GetSessionEventResponse{}, err
 	}
 
-	sessionAttendeeResponses := []dto.SessionAtendeeResponse{}
-
-	for _, sessionAttendee := range sessionAttendees {
-		sessionAttendeeResponses = append(sessionAttendeeResponses, dto.SessionAtendeeResponse{
-			SessionID: sessionAttendee.SessionID,
-			UserID: sessionAttendee.UserID,
-			Reason: sessionAttendee.Reason.String,
-			Review: sessionAttendee.Review.String,
-			User: dto.UserResponse{
-				ID:    sessionAttendee.User.ID,
-				Name:  sessionAttendee.User.Name,
-				Email: sessionAttendee.User.Email,
-			},
-			Session: dto.SessionResponse{
-				ID:          sessionAttendee.Session.ID,
-				Title:       sessionAttendee.Session.Title,
-				Description: sessionAttendee.Session.Description.String,
-				Type:        sessionAttendee.Session.Type,
-				Tags:        sessionAttendee.Session.TagsArray(),
-				StartAt:     sessionAttendee.Session.StartAt,
-				EndAt:       sessionAttendee.Session.EndAt,
-				Room:        sessionAttendee.Session.Room.String,
-				MeetingURL:  sessionAttendee.Session.MeetingURL.String,
-				Capacity:    sessionAttendee.Session.Capacity,
-				ImageURI:    sessionAttendee.Session.ImageURI.String,
-				Status:      sessionAttendee.Session.Status,
-				Proposer: dto.UserResponse{
-					ID:    sessionAttendee.Session.Proposer.ID,
-					Name:  sessionAttendee.Session.Proposer.Name,
-					Email: sessionAttendee.Session.Proposer.Email,
-				},
-				SessionAtendees: []dto.SessionAtendeeResponse{},
-			},
-		})
-	}
 
 	sessionResponse := dto.SessionResponse{
 		ID:          session.ID,
@@ -292,7 +264,7 @@ func (s *sessionService) GetSession(
 			Name:  session.Proposer.Name,
 			Email: session.Proposer.Email,
 		},
-		SessionAtendees: sessionAttendeeResponses,
+		CountAttendees: countSessionAttendees,
 	}
 
 	res := dto.GetSessionEventResponse{
@@ -395,6 +367,19 @@ func (s *sessionService) GetSessions(ctx context.Context, query dto.GetSessionsQ
 
 	sessionsResponse := []dto.SessionResponse{}
 	for _, session := range sessions {
+		countSessionAttendees, err := s.repo.CountAttendees(
+			ctx,
+			session.ID,
+			uuid.Nil,
+			time.Time{},
+			time.Time{},
+			false,
+		)
+
+		if err != nil {
+			return dto.GetSessionsResponse{}, err
+		}
+
 		sessionsResponse = append(sessionsResponse, dto.SessionResponse{
 			ID:          session.ID,
 			Title:       session.Title,
@@ -413,6 +398,7 @@ func (s *sessionService) GetSessions(ctx context.Context, query dto.GetSessionsQ
 				Name:  session.Proposer.Name,
 				Email: session.Proposer.Email,
 			},
+			CountAttendees: countSessionAttendees,
 		})
 	}
 
