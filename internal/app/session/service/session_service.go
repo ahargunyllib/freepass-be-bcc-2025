@@ -688,6 +688,15 @@ func (s *sessionService) ReviewSession(
 		return domain.ErrSessionNotAccepted
 	}
 
+	now := time.Now()
+	if session.StartAt.After(now) {
+		return domain.ErrSessionNotStarted
+	}
+
+	if session.EndAt.After(now) {
+		return domain.ErrSessionNotEnded
+	}
+
 	sessionAttendee, err := s.repo.FindSessionAttendee(ctx, query.SessionID, req.UserID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

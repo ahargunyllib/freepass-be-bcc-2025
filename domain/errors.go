@@ -88,9 +88,19 @@ var ErrSessionAlreadyStarted = &RequestError{
 	Err:        errors.New("session already started"),
 }
 
+var ErrSessionNotStarted = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session not started"),
+}
+
 var ErrSessionAlreadyEnded = &RequestError{
 	StatusCode: http.StatusBadRequest,
 	Err:        errors.New("session already ended"),
+}
+
+var ErrSessionNotEnded = &RequestError{
+	StatusCode: http.StatusBadRequest,
+	Err:        errors.New("session not ended"),
 }
 
 var ErrSessionNotAccepted = &RequestError{
