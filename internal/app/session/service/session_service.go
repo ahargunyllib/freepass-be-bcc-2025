@@ -409,6 +409,7 @@ func (s *sessionService) GetSessions(ctx context.Context, query dto.GetSessionsQ
 		query.AfterAt,
 		query.ProposerID,
 		query.Status,
+		query.UserID,
 	)
 	if err != nil {
 		return dto.GetSessionsResponse{}, err

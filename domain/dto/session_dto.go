@@ -44,6 +44,7 @@ type GetSessionsQuery struct {
 	AfterAt    time.Time `query:"after_at" validate:"omitempty"`
 	Status     int16     `query:"status" validate:"omitempty,numeric,oneof=1 2 3"`
 	ProposerID uuid.UUID `query:"proposer_id" validate:"omitempty,uuid"`
+	UserID     uuid.UUID `query:"user_id" validate:"omitempty,uuid"`
 }
 
 type GetSessionsResponse struct {

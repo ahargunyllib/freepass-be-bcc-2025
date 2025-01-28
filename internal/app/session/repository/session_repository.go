@@ -65,13 +65,16 @@ func (s *sessionRepository) FindAll(
 	afterAt time.Time,
 	proposerID uuid.UUID,
 	status int16,
+	userID uuid.UUID,
 ) ([]entity.Session, error) {
 	sessions := []entity.Session{}
 
 	query := `SELECT
 		sessions.*, proposer.id as "proposer.id", proposer.name as "proposer.name",
 		proposer.email as "proposer.email", proposer.role as "proposer.role"
-		FROM sessions JOIN users proposer ON proposer.id=sessions.proposer_id
+		FROM sessions
+		JOIN users proposer ON proposer.id=sessions.proposer_id
+		JOIN session_attendees ON session_attendees.session_id=sessions.id
 		WHERE 1=1
 	`
 	args := []interface{}{}
@@ -109,6 +112,11 @@ func (s *sessionRepository) FindAll(
 	if status != 0 {
 		query += fmt.Sprintf(" AND status = $%d", len(args)+1)
 		args = append(args, status)
+	}
+
+	if userID != uuid.Nil {
+		query += fmt.Sprintf(" AND session_attendees.user_id = $%d", len(args)+1)
+		args = append(args, userID)
 	}
 
 	log.Info(log.LogInfo{

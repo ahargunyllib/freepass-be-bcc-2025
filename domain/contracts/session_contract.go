@@ -20,6 +20,7 @@ type SessionRepository interface {
 		afterAt time.Time,
 		proposerID uuid.UUID,
 		status int16,
+		userID uuid.UUID,
 	) ([]entity.Session, error)
 	Count(
 		ctx context.Context,
