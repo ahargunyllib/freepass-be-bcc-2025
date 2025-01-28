@@ -19,7 +19,7 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 	controller := sessionController{service: service}
 
 	sessionRouter := router.Group("/sessions")
-	
+
 	sessionRouter.Get("/", middleware.RequireAuth(),
 		controller.GetSessions)
 	sessionRouter.Get("/:id",
@@ -64,7 +64,7 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 		middleware.RequirePermission([]int16{2}), // admin
 		controller.RejectSession,
 	)
-	sessionRouter.Post(
+	sessionRouter.Post( // ! IGNORE
 		"/:id/cancel",
 		middleware.RequireAuth(),
 		middleware.RequirePermission([]int16{2}), // admin
@@ -77,7 +77,7 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 		middleware.RequirePermission([]int16{1}), // user
 		controller.RegisterSession,
 	)
-	sessionRouter.Post(
+	sessionRouter.Post( // ! IGNORE
 		"/:sessionID/unregister",
 		middleware.RequireAuth(),
 		middleware.RequirePermission([]int16{1}), // user
