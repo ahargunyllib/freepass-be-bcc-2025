@@ -37,7 +37,7 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 		middleware.RequirePermission([]int16{1}), // user
 		controller.CreateSession,
 	)
-	sessionRouter.Put(
+	sessionRouter.Patch(
 		"/:id",
 		middleware.RequireAuth(),
 		middleware.RequirePermission([]int16{1}), // user
