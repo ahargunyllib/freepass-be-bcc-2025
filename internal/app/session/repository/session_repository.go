@@ -383,7 +383,7 @@ func (s *sessionRepository) FindSessionAttendees(
 		args = append(args, userID)
 	}
 
-	query += fmt.Sprintf(" ORDER BY %s %s LIMIT $%d OFFSET $%d", sortBy, sortOrder, len(args)+1, len(args)+2)
+	query += fmt.Sprintf(" AND session_attendees.deleted_reason IS NULL ORDER BY %s %s LIMIT $%d OFFSET $%d", sortBy, sortOrder, len(args)+1, len(args)+2)
 	args = append(args, limit, offset)
 
 	sessionAttendees := []entity.SessionAttendee{}
