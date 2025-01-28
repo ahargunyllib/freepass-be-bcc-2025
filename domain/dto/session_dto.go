@@ -9,16 +9,16 @@ import (
 type SessionResponse struct {
 	ID              uuid.UUID                `json:"id"`
 	Title           string                   `json:"title"`
-	Description     *string                  `json:"description"`
+	Description     string                   `json:"description,omitempty"`
 	Type            int16                    `json:"type"`
 	Tags            []string                 `json:"tags"`
 	StartAt         time.Time                `json:"start_at"`
 	EndAt           time.Time                `json:"end_at"`
-	Room            *string                  `json:"room"`
+	Room            string                   `json:"room,omitempty"`
 	Status          int16                    `json:"status"`
-	MeetingURL      *string                  `json:"meeting_url"`
+	MeetingURL      string                   `json:"meeting_url,omitempty"`
 	Capacity        int                      `json:"capacity"`
-	ImageURI        *string                  `json:"image_uri"`
+	ImageURI        string                   `json:"image_uri,omitempty"`
 	Proposer        UserResponse             `json:"proposer"`
 	SessionAtendees []SessionAtendeeResponse `json:"session_attendees"`
 }
@@ -26,8 +26,8 @@ type SessionResponse struct {
 type SessionAtendeeResponse struct {
 	SessionID uuid.UUID `json:"session_id"`
 	UserID    uuid.UUID `json:"user_id"`
-	Review    string   `json:"review,omitempty"`
-	Reason    string   `json:"reason,omitempty"`
+	Review    string    `json:"review,omitempty"`
+	Reason    string    `json:"reason,omitempty"`
 	User      UserResponse
 	Session   SessionResponse
 }
@@ -127,7 +127,7 @@ type UnregisterSessionQuery struct {
 
 type UnregisterSessionRequest struct {
 	UserID uuid.UUID // from context
-	Reason string `json:"reason" validate:"required,min=3,max=255"`
+	Reason string    `json:"reason" validate:"required,min=3,max=255"`
 }
 
 type ReviewSessionQuery struct {
@@ -136,7 +136,7 @@ type ReviewSessionQuery struct {
 
 type ReviewSessionRequest struct {
 	UserID uuid.UUID // from context
-	Review string `json:"review" validate:"required,min=3,max=255"`
+	Review string    `json:"review" validate:"required,min=3,max=255"`
 }
 
 type DeleteReviewSessionQuery struct {
