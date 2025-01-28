@@ -48,7 +48,7 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 	sessionRouter.Delete(
 		"/:id",
 		middleware.RequireAuth(),
-		middleware.RequirePermission([]int16{1}), // user
+		middleware.RequirePermission([]int16{1,2}), // user
 		middleware.AuthorizationSessionProposal(),
 		controller.DeleteSession,
 	)

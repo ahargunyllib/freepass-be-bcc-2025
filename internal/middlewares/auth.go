@@ -62,6 +62,10 @@ func (m *Middleware) AuthorizationSessionProposal() fiber.Handler {
 			return domain.ErrNoBearerToken
 		}
 
+		if claims.Role == 2 { // event coordinator can access all session proposal
+			return ctx.Next()
+		}
+
 		id := ctx.Params("id")
 		uuid, err := uuid.Parse(id)
 		if err != nil {

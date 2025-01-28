@@ -194,17 +194,13 @@ func (s *sessionService) DeleteSession(ctx context.Context, query dto.DeleteSess
 		return valErr
 	}
 
-	session, err := s.repo.FindByID(ctx, query.ID)
+	_, err := s.repo.FindByID(ctx, query.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.ErrSessionNotFound
 		}
 
 		return err
-	}
-
-	if session.Status != 1 {
-		return domain.ErrSessionCannotBeDeleted
 	}
 
 	err = s.repo.Delete(ctx, query.ID)
