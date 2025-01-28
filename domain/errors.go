@@ -130,7 +130,7 @@ var ErrSessionTimeConflict = &RequestError{
 
 var ErrSessionCancelled = &RequestError{
 	StatusCode: http.StatusBadRequest,
-	Err:        errors.New("you already cancel this session"),
+	Err:        errors.New("already cancel this session"),
 }
 
 var ErrReviewDeleted = &RequestError{
