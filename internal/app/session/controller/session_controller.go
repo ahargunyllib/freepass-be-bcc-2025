@@ -22,7 +22,11 @@ func InitSessionController(router fiber.Router, service contracts.SessionService
 	sessionRouter.Get("/", middleware.RequireAuth(),
 		middleware.RequirePermission([]int16{1, 2}), // user, event coordinator
 		controller.GetSessions)
-	sessionRouter.Get("/:id", controller.GetSession)
+	sessionRouter.Get("/:id",
+		middleware.RequireAuth(),
+		middleware.RequirePermission([]int16{1, 2}), // user, event coordinator
+		controller.GetSession,
+	)
 	sessionRouter.Post(
 		"/",
 		middleware.RequireAuth(),
