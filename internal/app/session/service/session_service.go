@@ -194,13 +194,22 @@ func (s *sessionService) DeleteSession(ctx context.Context, query dto.DeleteSess
 		return valErr
 	}
 
-	_, err := s.repo.FindByID(ctx, query.ID)
+	session, err := s.repo.FindByID(ctx, query.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.ErrSessionNotFound
 		}
 
 		return err
+	}
+
+	now := time.Now()
+	if session.StartAt.Before(now) {
+		return domain.ErrSessionAlreadyStarted
+	}
+
+	if session.EndAt.Before(now) {
+		return domain.ErrSessionAlreadyEnded
 	}
 
 	err = s.repo.Delete(ctx, query.ID)
@@ -533,6 +542,15 @@ func (s *sessionService) UpdateSession(ctx context.Context, req dto.UpdateSessio
 
 	if session.Status != 1 && req.Title != "" {
 		return domain.ErrCantUpdateTitle
+	}
+
+	now := time.Now()
+	if session.StartAt.Before(now) {
+		return domain.ErrSessionAlreadyStarted
+	}
+
+	if session.EndAt.Before(now) {
+		return domain.ErrSessionAlreadyEnded
 	}
 
 	tagsBinary := "000000"
