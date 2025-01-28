@@ -253,9 +253,6 @@ func (c *sessionController) RegisterSession(ctx *fiber.Ctx) error {
 	}
 
 	var req dto.RegisterSessionRequest
-	if err := ctx.BodyParser(&req); err != nil {
-		return err
-	}
 
 	claims, ok := ctx.Locals("claims").(jwt.Claims)
 	if !ok {
