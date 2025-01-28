@@ -65,8 +65,8 @@ func (u *userRepository) FindAll(
 	args := []interface{}{}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (name ILIKE %$%d% OR email ILIKE %$%d%)", len(args)+1, len(args)+1)
-		args = append(args, search, search)
+		query += fmt.Sprintf(" AND (name ILIKE $%d OR email ILIKE $%d)", len(args)+1, len(args)+1)
+		args = append(args, "%"+search+"%")
 	}
 
 	if role != 0 {
@@ -91,8 +91,8 @@ func (u *userRepository) Count(ctx context.Context, search string, role int16) (
 	args := []interface{}{}
 
 	if search != "" {
-		query += fmt.Sprintf(" AND (name ILIKE %$%d% OR email ILIKE %$%d%)", len(args)+1, len(args)+1)
-		args = append(args, search, search)
+		query += fmt.Sprintf(" AND (name ILIKE $%d OR email ILIKE $%d)", len(args)+1, len(args)+1)
+		args = append(args, "%"+search+"%")
 	}
 
 	if role != 0 {
