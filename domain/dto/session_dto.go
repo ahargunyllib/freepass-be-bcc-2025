@@ -29,7 +29,6 @@ type SessionAttendeeResponse struct {
 	Review    string          `json:"review,omitempty"`
 	Reason    string          `json:"reason,omitempty"`
 	User      UserResponse    `json:"user"`
-	Session   SessionResponse `json:"session"`
 }
 
 type GetSessionsQuery struct {

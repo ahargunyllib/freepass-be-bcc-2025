@@ -270,9 +270,14 @@ func (s *sessionService) GetSessionAttendees(
 		return dto.GetSessionAttendeesResponse{}, err
 	}
 
+	totalPage := int(countSessionAttendees) / query.Limit
+	if int(countSessionAttendees)%query.Limit != 0 {
+		totalPage++
+	}
+
 	meta := dto.PaginationResponse{
 		TotalData: countSessionAttendees,
-		TotalPage: int(countSessionAttendees) / query.Limit,
+		TotalPage: totalPage,
 		Page:      query.Page,
 		Limit:     query.Limit,
 	}
