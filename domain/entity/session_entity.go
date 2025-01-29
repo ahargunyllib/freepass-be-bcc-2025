@@ -2,7 +2,7 @@ package entity
 
 import (
 	"database/sql"
-	"strconv"
+	"fmt"
 	"time"
 
 	"github.com/ahargunyllib/freepass-be-bcc-2025/domain/enums"
@@ -10,24 +10,24 @@ import (
 )
 
 type Session struct {
-	ID               uuid.UUID         `db:"id" json:"id"`
-	ProposerID       uuid.UUID         `db:"proposer_id" json:"proposer_id"`
-	Title            string            `db:"title" json:"title"`
-	Description      sql.NullString    `db:"description" json:"description"`
-	Type             int16             `db:"type" json:"type"`
-	Tags             int16             `db:"tags" json:"tags"`
-	Status           int16             `db:"status" json:"status"`
-	StartAt          time.Time         `db:"start_at" json:"start_at"`
-	EndAt            time.Time         `db:"end_at" json:"end_at"`
-	Room             sql.NullString    `db:"room" json:"room"`
-	MeetingURL       sql.NullString    `db:"meeting_url" json:"meeting_url"`
-	Capacity         int               `db:"capacity" json:"capacity"`
-	ImageURI         sql.NullString    `db:"image_uri" json:"image_uri"`
-	CreatedAt        time.Time         `db:"created_at" json:"created_at"`
-	UpdatedAt        time.Time         `db:"updated_at" json:"updated_at"`
-	DeletedAt        sql.NullTime      `db:"deleted_at" json:"deleted_at"`
-	DeletedReason    sql.NullString    `db:"deleted_reason" json:"deleted_reason"`
-	Proposer         User              `db:"proposer" json:"proposer"`
+	ID            uuid.UUID      `db:"id" json:"id"`
+	ProposerID    uuid.UUID      `db:"proposer_id" json:"proposer_id"`
+	Title         string         `db:"title" json:"title"`
+	Description   sql.NullString `db:"description" json:"description"`
+	Type          int16          `db:"type" json:"type"`
+	Tags          int16          `db:"tags" json:"tags"`
+	Status        int16          `db:"status" json:"status"`
+	StartAt       time.Time      `db:"start_at" json:"start_at"`
+	EndAt         time.Time      `db:"end_at" json:"end_at"`
+	Room          sql.NullString `db:"room" json:"room"`
+	MeetingURL    sql.NullString `db:"meeting_url" json:"meeting_url"`
+	Capacity      int            `db:"capacity" json:"capacity"`
+	ImageURI      sql.NullString `db:"image_uri" json:"image_uri"`
+	CreatedAt     time.Time      `db:"created_at" json:"created_at"`
+	UpdatedAt     time.Time      `db:"updated_at" json:"updated_at"`
+	DeletedAt     sql.NullTime   `db:"deleted_at" json:"deleted_at"`
+	DeletedReason sql.NullString `db:"deleted_reason" json:"deleted_reason"`
+	Proposer      User           `db:"proposer" json:"proposer"`
 }
 
 type SessionAttendee struct {
@@ -41,7 +41,7 @@ type SessionAttendee struct {
 }
 
 func (s *Session) TagsArray() []string {
-	binary := strconv.FormatInt(int64(s.Tags), 2)
+	binary := fmt.Sprintf("%06b", s.Tags) // Always ensures a 6-bit binary string
 
 	// convert binary to array of tags
 	tags := []string{}
