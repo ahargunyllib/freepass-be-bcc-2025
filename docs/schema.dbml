@@ -1,0 +1,53 @@
+Table "schema_migrations" {
+  "version" int8 [pk, not null]
+  "dirty" bool [not null]
+}
+
+Table "session_attendees" {
+  "session_id" varchar(255) [not null]
+  "user_id" varchar(255) [not null]
+  "review" varchar(255)
+  "reason" varchar(255)
+  "deleted_reason" varchar(255)
+
+  Indexes {
+    (session_id, user_id) [type: btree, name: "session_attendees_pkey"]
+  }
+}
+
+Table "sessions" {
+  "id" varchar(255) [pk, not null]
+  "proposer_id" varchar(255) [not null]
+  "title" varchar(255) [not null]
+  "description" text
+  "type" int2 [not null, default: 1]
+  "tags" int2 [not null, default: 1]
+  "status" int2 [not null, default: 1]
+  "start_at" timestamp [not null]
+  "end_at" timestamp [not null]
+  "room" varchar(255)
+  "meeting_url" varchar(255)
+  "capacity" int4 [not null]
+  "image_uri" varchar(255)
+  "created_at" timestamp [default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+  "deleted_at" timestamp
+  "deleted_reason" varchar(255)
+}
+
+Table "users" {
+  "id" varchar(255) [pk, not null]
+  "name" varchar(255) [not null]
+  "email" varchar(255) [unique, not null]
+  "password" varchar(255) [not null]
+  "role" int2 [not null, default: 1]
+  "image_uri" varchar(255)
+  "created_at" timestamp [default: `CURRENT_TIMESTAMP`]
+  "updated_at" timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Ref "session_attendees_session_id_fkey":"sessions"."id" < "session_attendees"."session_id" [delete: cascade]
+
+Ref "session_attendees_user_id_fkey":"users"."id" < "session_attendees"."user_id" [delete: cascade]
+
+Ref "sessions_proposer_id_fkey":"users"."id" < "sessions"."proposer_id" [delete: cascade]
