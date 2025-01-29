@@ -12,7 +12,7 @@ The application is built on [Go v1.23.4](https://tip.golang.org/doc/go1.22) and 
 
 For database schema documentation, see [here](https://dbdocs.io/ahargunyllib/freepass-be-bcc-2025), powered by [dbdocs.io](https://dbdocs.io/).
 
-For API documentation, see [here](https://bcc-conference-api-docs.ahargunyllib.tech), powered by [Apidog](https://apidog.com/).
+For API documentation, see [here](https://bcc-conference-api-docs.ahargunyllib.tech) or [here](https://qvfbebhy7x.apidog.io), powered by [Apidog](https://apidog.com/).
 
 ## Architecture
 
