@@ -74,7 +74,7 @@ func (s *sessionRepository) FindAll(
 		proposer.email as "proposer.email", proposer.role as "proposer.role"
 		FROM sessions
 		JOIN users proposer ON proposer.id=sessions.proposer_id
-		JOIN session_attendees ON session_attendees.session_id=sessions.id
+		LEFT JOIN session_attendees ON session_attendees.session_id=sessions.id
 		WHERE 1=1
 	`
 	args := []interface{}{}
@@ -119,12 +119,18 @@ func (s *sessionRepository) FindAll(
 		args = append(args, userID)
 	}
 
+	query += fmt.Sprintf(
+		" AND deleted_at IS NULL ORDER BY %s %s LIMIT $%d OFFSET $%d",
+		sortBy,
+		sortOrder,
+		len(args)+1,
+		len(args)+2,
+	)
+	args = append(args, limit, offset)
+
 	log.Info(log.LogInfo{
 		"query": query,
 	}, "[SessionRepository] FindAll")
-
-	query += fmt.Sprintf(" ORDER BY %s %s LIMIT $%d OFFSET $%d", sortBy, sortOrder, len(args)+1, len(args)+2)
-	args = append(args, limit, offset)
 
 	err := s.db.SelectContext(ctx, &sessions, query, args...)
 	if err != nil {
@@ -188,6 +194,10 @@ func (s *sessionRepository) Count(
 	}
 
 	query += " AND deleted_at IS NULL"
+
+	log.Info(log.LogInfo{
+		"query": query,
+	}, "[SessionRepository] FindAll")
 
 	err := s.db.GetContext(ctx, &count, query, args...)
 	if err != nil {

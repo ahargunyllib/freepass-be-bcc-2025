@@ -122,7 +122,7 @@ func (c *sessionController) GetSessions(ctx *fiber.Ctx) error {
 	}
 
 	// get not accepted proposals
-	if query.Status != 2 { // not accepted
+	if query.Status != 2 && query.Status != 0 { // not accepted
 		claims, ok := ctx.Locals("claims").(jwt.Claims)
 		if !ok {
 			return domain.ErrClaimsNotFound
